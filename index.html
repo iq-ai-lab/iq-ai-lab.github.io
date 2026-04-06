@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IQ AI Lab</title>
+  <meta name="description" content="수학적 증명으로 AI의 본질을 탐구하는 딥다이브 연구소">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    :root {
+      --bg: #05070d;
+      --surface: #090e1a;
+      --l0: #3B82F6;
+      --l1: #8B5CF6;
+      --l2: #F59E0B;
+      --l3: #22C55E;
+      --l4r: #EF4444;
+      --l4l: #F97316;
+      --l4c: #EC4899;
+      --l4n: #06B6D4;
+      --l5: #A78BFA;
+      --muted: #3a4a5a;
+      --text: #CBD5E1;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); font-family:'Noto Sans KR',sans-serif; }
+
+    #eq-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    header {
+      position:fixed; top:0; left:0; width:100%; z-index:20;
+      padding:14px 36px; display:flex; align-items:center; gap:16px;
+      background:linear-gradient(180deg,rgba(5,7,13,0.96) 55%,transparent 100%);
+    }
+    .brand { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:6px; color:var(--text); line-height:1; }
+    .brand-sub { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-top:2px; }
+    .h-sep { width:1px; height:32px; background:rgba(255,255,255,0.05); }
+    .h-desc { font-size:11.5px; color:var(--muted); line-height:1.7; font-weight:300; }
+    .h-desc em { color:var(--text); font-style:normal; }
+    .h-right { margin-left:auto; display:flex; gap:20px; }
+    .stat-n { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; color:var(--text); line-height:1; text-align:center; }
+    .stat-l { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); letter-spacing:1px; text-align:center; }
+
+    #gw { position:fixed; inset:0; z-index:1; }
+    #graph { width:100%; height:100%; cursor:grab; }
+    #graph:active { cursor:grabbing; }
+
+    #legend {
+      position:fixed; bottom:24px; left:36px; z-index:20;
+      display:flex; flex-direction:column; gap:5px;
+    }
+    .li { display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); }
+    .ld { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+    #hint { position:fixed; bottom:24px; right:36px; z-index:20; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); text-align:right; line-height:2; }
+
+    #tt { position:fixed; z-index:50; pointer-events:none; opacity:0; transition:opacity 0.15s; width:280px; }
+    .ttb { background:var(--surface); border-radius:10px; padding:14px 16px; border:1px solid rgba(255,255,255,0.06); }
+    #tt-layer { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+    #tt-name { font-size:13px; font-weight:500; color:var(--text); margin-bottom:6px; line-height:1.3; }
+    #tt-eq { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); margin-bottom:8px; line-height:1.8; }
+    #tt-desc { font-size:10.5px; color:var(--muted); line-height:1.7; margin-bottom:10px; font-weight:300; }
+    .ttf { display:flex; justify-content:flex-end; }
+    #tt-link { font-family:'JetBrains Mono',monospace; font-size:9px; text-decoration:none; }
+
+    #intro { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; background:var(--bg); transition:opacity 0.9s; }
+    .intro-title { font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:12px; color:var(--text); text-align:center; }
+    .intro-eq { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:2px; text-align:center; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<div id="intro">
+  <div>
+    <div class="intro-title">IQ AI LAB</div>
+    <div class="intro-eq">∂L/∂w → proof → implement → repeat</div>
+  </div>
+</div>
+
+<canvas id="eq-canvas"></canvas>
+
+<header>
+  <div>
+    <div class="brand">IQ AI LAB</div>
+    <div class="brand-sub">I QUESTION</div>
+  </div>
+  <div class="h-sep"></div>
+  <div class="h-desc">
+    <em>수학적 증명</em>으로 AI의 본질을 탐구합니다<br>
+    가정 → 보조정리 → 증명 → 구현 → 통찰
+  </div>
+  <div class="h-right">
+    <div><div class="stat-n">34</div><div class="stat-l">repos</div></div>
+    <div><div class="stat-n">6</div><div class="stat-l">layers</div></div>
+  </div>
+</header>
+
+<div id="gw"><svg id="graph"></svg></div>
+
+<div id="tt">
+  <div class="ttb">
+    <div id="tt-layer"></div>
+    <div id="tt-name"></div>
+    <div id="tt-eq"></div>
+    <div id="tt-desc"></div>
+    <div class="ttf"><a id="tt-link" href="#" target="_blank">GitHub →</a></div>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="li"><div class="ld" style="background:#3B82F6"></div>Layer 0 — Mathematics</div>
+  <div class="li"><div class="ld" style="background:#8B5CF6"></div>Layer 1 — ML Theory</div>
+  <div class="li"><div class="ld" style="background:#F59E0B"></div>Layer 2 — Neural Networks</div>
+  <div class="li"><div class="ld" style="background:#22C55E"></div>Layer 3 — Architectures</div>
+  <div class="li"><div class="ld" style="background:#EF4444"></div>Layer 4 — Domain</div>
+  <div class="li"><div class="ld" style="background:#A78BFA"></div>Layer 5 — Systems</div>
+</div>
+
+<div id="hint">scroll · zoom<br>drag · pan<br>click · open</div>
+
+<script>
+// ── FALLING EQUATIONS ──────────────────────────────────────────────────────
+(function() {
+  const c = document.getElementById('eq-canvas');
+  const ctx = c.getContext('2d');
+  const EQS = [
+    '∂L/∂w','σ(Wx+b)','∇θJ(θ)','E[Rₜ]','V*(s)','π*(a|s)',
+    'KL(p‖q)','H(X)','∑wᵢxᵢ','argmax Q','P(y|x)',
+    'δ=r+γV(s\')','ELBO','Aᵀ=UΣVᵀ','∫p(x)dx=1',
+    'J(π)=Eτ[R]','det(J)','‖w‖²','tanh(z)','ReLU(x)',
+    'βKL','L=−logP','α∇J','μ,σ²','Σ⁻¹','tr(A)',
+  ];
+  let drops = [];
+
+  function resize() {
+    c.width = innerWidth; c.height = innerHeight;
+    drops = Array.from({length:28}, () => ({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      eq: EQS[Math.floor(Math.random()*EQS.length)],
+      speed: Math.random()*0.35+0.08,
+      opacity: Math.random()*0.12+0.03,
+      size: Math.random()*3+9,
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    drops.forEach(d => {
+      ctx.font = `${d.size}px JetBrains Mono, monospace`;
+      ctx.fillStyle = `rgba(59,130,246,${d.opacity})`;
+      ctx.fillText(d.eq, d.x, d.y);
+      d.y += d.speed;
+      if (d.y > c.height + 30) {
+        d.y = -20;
+        d.x = Math.random() * c.width;
+        d.eq = EQS[Math.floor(Math.random()*EQS.length)];
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); draw();
+  addEventListener('resize', resize);
+})();
+
+// ── DATA ───────────────────────────────────────────────────────────────────
+const BASE = 'https://github.com/iq-ai-lab';
+
+const LAYERS = {
+  l0: { label:'Layer 0 · Mathematics', col:'#3B82F6', short:'Math' },
+  l1: { label:'Layer 1 · ML Theory',   col:'#8B5CF6', short:'ML Theory' },
+  l2: { label:'Layer 2 · Neural Nets', col:'#F59E0B', short:'Neural Nets' },
+  l3: { label:'Layer 3 · Architectures',col:'#22C55E',short:'Architectures' },
+  l4: { label:'Layer 4 · Domain',       col:'#EF4444', short:'Domain' },
+  l5: { label:'Layer 5 · Systems',      col:'#A78BFA', short:'Systems' },
+};
+
+const REPOS = [
+  // Layer 0
+  { id:'la',  layer:'l0', short:'Linear Algebra',   label:'Linear Algebra Deep Dive',    eq:'Aᵀ=UΣVᵀ  ·  det(A)  ·  λv=Av', url:`${BASE}/linear-algebra-deep-dive`,              desc:'벡터공간, 고유값 분해, SVD, PCA 증명, 텐서' },
+  { id:'pt',  layer:'l0', short:'Prob Theory',       label:'Probability Theory Deep Dive', eq:'P(A∩B)=P(A|B)P(B)  ·  E[X]', url:`${BASE}/probability-theory-deep-dive`,          desc:'측도 기반 확률론, 마팅게일, 수렴 4종' },
+  { id:'ms',  layer:'l0', short:'Math Stats',        label:'Mathematical Statistics',      eq:'MLE: θ̂=argmax logL(θ)',       url:`${BASE}/mathematical-statistics-deep-dive`,    desc:'MLE/MAP 유도, 가설검정, 점근이론' },
+  { id:'co',  layer:'l0', short:'Calculus & Opt',    label:'Calculus & Optimization',      eq:'∇f=0  ·  ∂f/∂xᵢ  ·  H≻0',    url:`${BASE}/calculus-optimization-deep-dive`,       desc:'편미분, 야코비안, 헤시안, 라그랑주' },
+  { id:'cx',  layer:'l0', short:'Convex Opt',        label:'Convex Optimization Deep Dive',eq:'KKT: ∇f+μᵀ∇g=0  ·  dual',    url:`${BASE}/convex-optimization-deep-dive`,         desc:'볼록 집합/함수, KKT 조건, 쌍대이론' },
+  { id:'it',  layer:'l0', short:'Info Theory',       label:'Information Theory Deep Dive', eq:'H(X)=−∑p log p  ·  KL(p‖q)', url:`${BASE}/information-theory-deep-dive`,          desc:'Shannon Entropy, KL-Divergence, 상호정보량' },
+  { id:'sp',  layer:'l0', short:'Stoch Processes',   label:'Stochastic Processes',         eq:'P(Xₙ₊₁|Xₙ)=P(Xₙ₊₁|X₀..Xₙ)', url:`${BASE}/stochastic-processes-deep-dive`,       desc:'마르코프 체인, 브라운 운동, MCMC' },
+  { id:'sd',  layer:'l0', short:'SDE',               label:'Stochastic Diff. Equations',   eq:'dX=μdt+σdW  ·  Itô formula',  url:`${BASE}/sde-deep-dive`,                         desc:'이토 적분, SDE, Fokker-Planck 방정식' },
+  { id:'fa',  layer:'l0', short:'Functional Analysis',label:'Functional Analysis',         eq:'‖f‖² = ⟨f,f⟩  ·  RKHS',      url:`${BASE}/functional-analysis-deep-dive`,         desc:'힐베르트 공간, 스펙트럴 이론, RKHS' },
+  { id:'ig',  layer:'l0', short:'Info Geometry',     label:'Information Geometry',         eq:'Fᵢⱼ=E[∂ᵢlog p·∂ⱼlog p]',     url:`${BASE}/information-geometry-deep-dive`,        desc:'Fisher 정보 행렬, Natural Gradient' },
+  // Layer 1
+  { id:'mf',  layer:'l1', short:'ML Fundamentals',   label:'ML Fundamentals Deep Dive',    eq:'ŷ=Xβ  ·  β=(XᵀX)⁻¹Xᵀy',     url:`${BASE}/ml-fundamentals-deep-dive`,             desc:'선형회귀 Normal Eq 유도, SVM, 앙상블' },
+  { id:'sl',  layer:'l1', short:'Statistical Learning',label:'Statistical Learning Theory', eq:'P(err)≤ε : PAC  ·  VC dim',   url:`${BASE}/statistical-learning-theory-deep-dive`,desc:'PAC Learning, VC 차원, Rademacher 복잡도' },
+  { id:'km',  layer:'l1', short:'Kernel Methods',    label:'Kernel Methods Deep Dive',      eq:'K(x,x\')=⟨φ(x),φ(x\')⟩',      url:`${BASE}/kernel-methods-deep-dive`,              desc:'Mercer 정리, RKHS, SVM 쌍대, GP' },
+  { id:'bm',  layer:'l1', short:'Bayesian ML',       label:'Bayesian ML Deep Dive',         eq:'P(θ|D)∝P(D|θ)P(θ)',           url:`${BASE}/bayesian-ml-deep-dive`,                 desc:'베이지안 추론, ELBO 유도, MCMC' },
+  { id:'gm',  layer:'l1', short:'Graphical Models',  label:'Graphical Models Deep Dive',    eq:'P(X)=∏ψc(Xc)/Z',             url:`${BASE}/graphical-models-deep-dive`,            desc:'베이지안 네트워크, 믿음 전파' },
+  // Layer 2
+  { id:'nn',  layer:'l2', short:'NN Theory',         label:'Neural Network Theory',         eq:'δˡ=(Wˡ⁺¹)ᵀδˡ⁺¹⊙σ\'(zˡ)',     url:`${BASE}/neural-network-theory-deep-dive`,       desc:'범용 근사 정리, 역전파 완전 유도' },
+  { id:'ot',  layer:'l2', short:'Optimization',      label:'Optimization Theory Deep Dive', eq:'θₜ₊₁=θₜ−α∇L  ·  Adam',       url:`${BASE}/optimization-theory-deep-dive`,         desc:'SGD 수렴 분석, Adam 수렴 반례' },
+  { id:'gt',  layer:'l2', short:'Generalization',    label:'Generalization Theory',         eq:'NTK: fθ(x)≈f₀(x)+Θ(x,·)α',  url:`${BASE}/generalization-theory-deep-dive`,       desc:'Double Descent, NTK, Grokking' },
+  { id:'rt',  layer:'l2', short:'Regularization',    label:'Regularization Theory',         eq:'L̃=L+λ‖w‖²  ·  Dropout',      url:`${BASE}/regularization-theory-deep-dive`,       desc:'L1/L2 베이즈 해석, BatchNorm 증명' },
+  // Layer 3
+  { id:'cn',  layer:'l3', short:'CNN',               label:'CNN Deep Dive',                 eq:'(f*g)[n]=∑f[m]g[n-m]',        url:`${BASE}/cnn-deep-dive`,                         desc:'Convolution 등변성, ResNet 항등 근사 이론' },
+  { id:'rn',  layer:'l3', short:'RNN & LSTM',        label:'RNN & LSTM Deep Dive',          eq:'hₜ=tanh(Wxₜ+Uhₜ₋₁+b)',       url:`${BASE}/rnn-lstm-deep-dive`,                    desc:'BPTT 완전 유도, Vanishing Gradient 증명' },
+  { id:'tr',  layer:'l3', short:'Transformer',       label:'Transformer Deep Dive',         eq:'Attn=softmax(QKᵀ/√d)V',       url:`${BASE}/transformer-deep-dive`,                 desc:'Attention 수식 완전 분해, √d 근거' },
+  { id:'gn',  layer:'l3', short:'GNN',               label:'Graph Neural Network',          eq:'h^(l+1)=σ(D̃⁻¹ÃH^(l)W^(l))', url:`${BASE}/gnn-deep-dive`,                         desc:'그래프 라플라시안 유도, WL 검사' },
+  { id:'gv',  layer:'l3', short:'Generative Models', label:'Generative Model Deep Dive',    eq:'ELBO=E[logp]-KL(q‖p)',        url:`${BASE}/generative-model-deep-dive`,            desc:'GAN minimax, VAE ELBO 완전 유도' },
+  // Layer 4
+  { id:'rf',  layer:'l4', short:'RL Foundations',    label:'RL Foundations Deep Dive',      eq:'V*(s)=maxₐ[r+γ∑V*(s\')]',     url:`${BASE}/rl-foundations-deep-dive`,              desc:'MDP 공리적 정의, 벨만 방정식 완전 유도' },
+  { id:'mfr', layer:'l4', short:'Model-Free RL',     label:'Model-Free RL Deep Dive',       eq:'Q(s,a)←Q+α[r+γmaxQ\'-Q]',    url:`${BASE}/model-free-rl-deep-dive`,               desc:'Q-Learning 수렴 증명(Robbins-Monro)' },
+  { id:'dr',  layer:'l4', short:'Deep RL',           label:'Deep RL Deep Dive',             eq:'L=(r+γmaxQ\'−Q(s,a;θ))²',    url:`${BASE}/deep-rl-deep-dive`,                     desc:'DQN 경험 재생 이론, Double DQN 편향 증명' },
+  { id:'pg',  layer:'l4', short:'Policy Gradient',   label:'Policy Gradient Deep Dive',     eq:'∇J=E[∇log π(a|s)·A(s,a)]',   url:`${BASE}/policy-gradient-deep-dive`,             desc:'REINFORCE 완전 유도, GAE λ-수익 유도' },
+  { id:'ar',  layer:'l4', short:'Advanced RL',       label:'Advanced RL Deep Dive',         eq:'PPO: clip(rₜ,1-ε,1+ε)Aₜ',   url:`${BASE}/advanced-rl-deep-dive`,                 desc:'TRPO 단조 개선 이론, SAC 엔트로피 최대화' },
+  { id:'lp',  layer:'l4', short:'LLM Pretraining',   label:'LLM Pretraining Deep Dive',     eq:'L∝N^0.34·D^0.28 (Chinchilla)',url:`${BASE}/llm-pretraining-deep-dive`,             desc:'Scaling Law, 학습 안정성, 데이터 혼합' },
+  { id:'la2', layer:'l4', short:'LLM Alignment',     label:'LLM Alignment Deep Dive',       eq:'DPO: logσ(β log π*/πref)',    url:`${BASE}/llm-alignment-deep-dive`,               desc:'RLHF, DPO Bradley-Terry 유도' },
+  { id:'df',  layer:'l4', short:'Diffusion Models',  label:'Diffusion Model Deep Dive',     eq:'p(xₜ₋₁|xₜ)=N(μθ,Σθ)',       url:`${BASE}/diffusion-model-deep-dive`,             desc:'DDPM 완전 유도, Score Matching' },
+  // Layer 5
+  { id:'pi',  layer:'l5', short:'PyTorch Internals', label:'PyTorch Internals Deep Dive',   eq:'∂L/∂x = Jᵀ·v (VJP)',         url:`${BASE}/pytorch-internals-deep-dive`,           desc:'Autograd 야코비안 벡터곱, CUDA 커널' },
+  { id:'ef',  layer:'l5', short:'Efficient ML',      label:'Efficient ML Deep Dive',        eq:'FlashAttn: O(N) memory',      url:`${BASE}/efficient-ml-deep-dive`,                desc:'Pruning/Quantization/Distillation 수학' },
+];
+
+// ── LAYOUT — layered pyramid ────────────────────────────────────────────────
+const W = innerWidth, H = innerHeight;
+const CX = W / 2;
+
+const LAYER_ORDER = ['l0','l1','l2','l3','l4','l5'];
+// Layer 0 at bottom, Layer 5 at top
+// Multi-row layer config: y = first row y, rowH = row spacing
+const LAYER_CONFIG = {
+  l5: { y: H * 0.10, rows: 1 },
+  l4: { y: H * 0.23, rows: 2, rowH: H * 0.08 },
+  l3: { y: H * 0.44, rows: 1 },
+  l2: { y: H * 0.57, rows: 1 },
+  l1: { y: H * 0.69, rows: 1 },
+  l0: { y: H * 0.79, rows: 2, rowH: H * 0.08 },
+};
+
+// For legend/line labels use first row y
+const LAYER_Y = Object.fromEntries(
+  Object.entries(LAYER_CONFIG).map(([k,v]) => [k, v.y])
+);
+
+function buildGraph() {
+  const nodes = [], byId = {}, links = [];
+
+  REPOS.forEach(r => {
+    const cfg = LAYER_CONFIG[r.layer];
+    const layerRepos = REPOS.filter(x => x.layer === r.layer);
+    const total = layerRepos.length;
+    const i = layerRepos.indexOf(r);
+
+    let x, y;
+    if (cfg.rows === 2) {
+      // Split into two rows: row0 = ceil(total/2), row1 = rest
+      const row0Count = Math.ceil(total / 2);
+      const row = i < row0Count ? 0 : 1;
+      const idxInRow = row === 0 ? i : i - row0Count;
+      const countInRow = row === 0 ? row0Count : total - row0Count;
+      const spread = Math.min(W * 0.80, countInRow * 120);
+      x = CX - spread/2 + (spread / (countInRow - 1 || 1)) * idxInRow;
+      y = cfg.y + row * cfg.rowH;
+    } else {
+      const spread = Math.min(W * 0.84, total * 120);
+      x = CX - spread/2 + (spread / (total - 1 || 1)) * i;
+      y = cfg.y;
+    }
+
+    const node = {...r, x, y};
+    nodes.push(node); byId[r.id] = node;
+  });
+
+  // Dependency links: each layer connects to next
+  const layerGroups = {};
+  LAYER_ORDER.forEach(l => { layerGroups[l] = nodes.filter(n => n.layer === l); });
+  // Dense links between layers — all-to-all style
+  const pairs = [['l0','l1'],['l1','l2'],['l2','l3'],['l3','l4'],['l4','l5']];
+  pairs.forEach(([a,b]) => {
+    const as = layerGroups[a], bs = layerGroups[b];
+    as.forEach(an => {
+      bs.forEach(bn => {
+        links.push({s: an.id, t: bn.id, layerA: a, layerB: b});
+      });
+    });
+  });
+
+  return {nodes, links, byId};
+}
+
+const {nodes, links, byId} = buildGraph();
+
+// ── SVG ────────────────────────────────────────────────────────────────────
+const svg = d3.select('#graph').attr('viewBox',`0 0 ${W} ${H}`);
+const root = svg.append('g');
+
+svg.call(d3.zoom().scaleExtent([0.2,4]).on('zoom', e => root.attr('transform', e.transform)));
+
+const defs = svg.append('defs');
+Object.entries(LAYERS).forEach(([k,v]) => {
+  const f = defs.append('filter').attr('id',`gl-${k}`)
+    .attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+  f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','5').attr('result','blur');
+  const m = f.append('feMerge');
+  m.append('feMergeNode').attr('in','blur');
+  m.append('feMergeNode').attr('in','SourceGraphic');
+});
+
+// Layer label lines
+LAYER_ORDER.forEach(lk => {
+  const meta = LAYERS[lk];
+  const y = LAYER_Y[lk];
+  root.append('line')
+    .attr('x1', 36).attr('y1', y).attr('x2', W-36).attr('y2', y)
+    .attr('stroke', meta.col).attr('stroke-width', 0.3).attr('stroke-opacity', 0.15)
+    .attr('stroke-dasharray','2,6');
+
+  root.append('text')
+    .attr('x', 42).attr('y', y - 10)
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size','8.5px')
+    .attr('fill', meta.col).attr('opacity', 0.45).attr('letter-spacing','1.5')
+    .text(meta.short.toUpperCase());
+});
+
+// Links
+root.append('g').selectAll('line').data(links).join('line')
+  .attr('x1',d=>byId[d.s].x).attr('y1',d=>byId[d.s].y)
+  .attr('x2',d=>byId[d.t].x).attr('y2',d=>byId[d.t].y)
+  .attr('stroke', d => LAYERS[byId[d.s].layer].col)
+  .attr('stroke-width', 0.6)
+  .attr('stroke-opacity', 0.28)
+  .attr('stroke-dasharray','2,4')
+  .style('opacity',0)
+  .transition().duration(1000).delay(700).style('opacity',1);
+
+// Nodes
+const nodeG = root.append('g').selectAll('g').data(nodes).join('g')
+  .attr('transform', d=>`translate(${d.x},${d.y})`);
+
+const NODE_R = 17;
+
+nodeG.each(function(d) {
+  const g = d3.select(this);
+  const col = LAYERS[d.layer].col;
+
+  g.append('circle').attr('r', NODE_R)
+    .attr('fill', col+'18')
+    .attr('stroke', col)
+    .attr('stroke-width', 1.1)
+    .attr('stroke-opacity', 0.55);
+
+  // Inner dot
+  g.append('circle').attr('r', 3.5).attr('fill', col).attr('opacity', 0.8);
+
+  // Label
+  const hub = {x: CX, y: LAYER_Y[d.layer]};
+  const dx = d.x - hub.x, dy = -1;
+  const anchor = Math.abs(d.x - CX) < 40 ? 'middle' : (d.x > CX ? 'start' : 'end');
+  const lx = anchor === 'middle' ? 0 : (anchor === 'start' ? NODE_R+6 : -(NODE_R+6));
+
+  g.append('text')
+    .attr('x', lx).attr('y', NODE_R+13)
+    .attr('text-anchor', anchor)
+    .attr('font-family','JetBrains Mono, monospace')
+    .attr('font-size','8.5px')
+    .attr('fill', col).attr('opacity', 0.72)
+    .text(d.short);
+
+  g.style('cursor','pointer')
+    .on('mouseenter', function(e, nd) {
+      d3.select(this).select('circle')
+        .attr('stroke-opacity', 1).attr('r', NODE_R+2.5)
+        .attr('filter', `url(#gl-${nd.layer})`);
+      showTT(e, nd);
+    })
+    .on('mousemove', moveTT)
+    .on('mouseleave', function(e, nd) {
+      d3.select(this).select('circle')
+        .attr('stroke-opacity', 0.55).attr('r', NODE_R).attr('filter', null);
+      hideTT();
+    })
+    .on('click', (e,nd) => { if(nd.url) window.open(nd.url,'_blank'); });
+});
+
+nodeG.style('opacity',0)
+  .transition().duration(700).delay((d,i)=>400+i*22)
+  .style('opacity',1);
+
+// ── TOOLTIP ────────────────────────────────────────────────────────────────
+const tt = document.getElementById('tt');
+function showTT(e,d) {
+  const col = LAYERS[d.layer].col;
+  document.getElementById('tt-layer').style.color = col;
+  document.getElementById('tt-layer').textContent = LAYERS[d.layer].label;
+  document.getElementById('tt-name').textContent = d.label;
+  document.getElementById('tt-eq').textContent = d.eq || '';
+  document.getElementById('tt-eq').style.color = col;
+  document.getElementById('tt-desc').textContent = d.desc || '';
+  const lnk = document.getElementById('tt-link');
+  lnk.href = d.url; lnk.style.color = col;
+  moveTT(e); tt.style.opacity='1';
+}
+function moveTT(e) {
+  let x=e.clientX+18, y=e.clientY-8;
+  if(x+290>innerWidth) x=e.clientX-290-10;
+  if(y+200>innerHeight) y=e.clientY-200;
+  tt.style.left=x+'px'; tt.style.top=y+'px';
+}
+function hideTT() { tt.style.opacity='0'; }
+
+// ── INTRO ──────────────────────────────────────────────────────────────────
+setTimeout(() => {
+  const intro = document.getElementById('intro');
+  intro.style.opacity='0';
+  setTimeout(()=>intro.remove(), 950);
+}, 800);
+</script>
+</body>
+</html>
