@@ -11,6 +11,9 @@
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Noto Sans KR',sans-serif}
     #eq-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+    /* vignette */
+    #vignette{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(5,7,13,.72) 100%)}
     #gw{position:fixed;inset:0;z-index:1;perspective:1200px;perspective-origin:50% 50%}
     #graph-inner{width:100%;height:100%;transform-style:preserve-3d;will-change:transform;transition:transform .07s linear}
     #graph{width:100%;height:100%;cursor:grab;display:block}
@@ -52,6 +55,7 @@
 </div>
 
 <canvas id="eq-bg"></canvas>
+<div id="vignette"></div>
 
 <header>
   <div><div class="brand">IQ AI LAB</div><div class="brand-sub">I QUESTION</div></div>
@@ -82,37 +86,124 @@
 <div id="hint">scroll · zoom<br>drag · pan<br>click · cascade</div>
 
 <script>
-// ═══ FALLING EQUATIONS — margins only ════════════
+// ═══ BACKGROUND — neural net + falling equations ════
 (function(){
   const c=document.getElementById('eq-bg'),ctx=c.getContext('2d');
+
+  // ── falling equations (margins only) ──────────────
   const EQS=['∂L/∂w','σ(z)','∇θJ','E[Rₜ]','V*(s)','π*(a|s)','KL(p‖q)','H(X)',
     'argmax Q','ELBO','Aᵀ=UΣVᵀ','∫p dx=1','J(π)','det(J)','‖w‖²',
     'tanh(z)','βKL','α∇J','Σ⁻¹','tr(A)','ReLU','softmax','∑wᵢxᵢ'];
   let drops=[];
+
+  // ── background neural dots ─────────────────────────
+  let bgDots=[];
+
+  // ── traveling signals between bg dots ─────────────
+  let bgSignals=[];
+
+  function initBgSignal(){
+    const tryConnect=()=>{
+      for(let t=0;t<30;t++){
+        const a=bgDots[Math.floor(Math.random()*bgDots.length)];
+        const b=bgDots[Math.floor(Math.random()*bgDots.length)];
+        const d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d>60&&d<180){
+          bgSignals.push({ax:a.x,ay:a.y,bx:b.x,by:b.y,p:0,sp:.007+Math.random()*.005});
+          break;
+        }
+      }
+    };
+    tryConnect();
+    setTimeout(initBgSignal,700+Math.random()*1100);
+  }
+
   function resize(){
     c.width=innerWidth; c.height=innerHeight;
-    const mW=innerWidth*.11;
-    drops=Array.from({length:24},()=>({
-      x:Math.random()<.5?Math.random()*mW:innerWidth-mW+Math.random()*mW,
-      y:Math.random()*c.height,
+    const W=c.width,H=c.height;
+    const mW=W*.11;
+
+    // falling equations — margins
+    drops=Array.from({length:22},()=>({
+      x:Math.random()<.5?Math.random()*mW:W-mW+Math.random()*mW,
+      y:Math.random()*H,
       eq:EQS[Math.floor(Math.random()*EQS.length)],
-      speed:Math.random()*.26+.06,
-      opacity:Math.random()*.065+.02,
+      speed:Math.random()*.24+.05,
+      opacity:Math.random()*.055+.018,
       size:Math.floor(Math.random()*4)+9,
     }));
+
+    // neural background dots — spread everywhere
+    bgDots=Array.from({length:72},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.11, vy:(Math.random()-.5)*.11,
+      r:Math.random()*.8+.25,
+      op:Math.random()*.08+.03,
+    }));
   }
+
   function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
+    const W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+
+    // ── bg connections (check nearby pairs) ────────
+    for(let i=0;i<bgDots.length;i++){
+      for(let j=i+1;j<bgDots.length;j++){
+        const a=bgDots[i],b=bgDots[j];
+        const d=Math.hypot(a.x-b.x,a.y-b.y);
+        if(d<165){
+          const op=(1-d/165)*.038;
+          ctx.beginPath();
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle=`rgba(59,130,246,${op.toFixed(3)})`;
+          ctx.lineWidth=.45;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // ── bg dots ────────────────────────────────────
+    bgDots.forEach(d=>{
+      ctx.beginPath();
+      ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(59,130,246,${d.op.toFixed(3)})`;
+      ctx.fill();
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<-12)d.x=W+12;else if(d.x>W+12)d.x=-12;
+      if(d.y<-12)d.y=H+12;else if(d.y>H+12)d.y=-12;
+    });
+
+    // ── traveling signal particles ─────────────────
+    for(let i=bgSignals.length-1;i>=0;i--){
+      const s=bgSignals[i];
+      s.p+=s.sp;
+      const x=s.ax+(s.bx-s.ax)*s.p;
+      const y=s.ay+(s.by-s.ay)*s.p;
+      const op=Math.sin(s.p*Math.PI)*.38;
+      ctx.beginPath();
+      ctx.arc(x,y,1.8,0,Math.PI*2);
+      ctx.fillStyle=`rgba(59,130,246,${op.toFixed(3)})`;
+      ctx.fill();
+      if(s.p>=1)bgSignals.splice(i,1);
+    }
+
+    // ── falling equations ──────────────────────────
     drops.forEach(d=>{
       ctx.font=`${d.size}px JetBrains Mono,monospace`;
       ctx.fillStyle=`rgba(59,130,246,${d.opacity})`;
       ctx.fillText(d.eq,d.x,d.y);
       d.y+=d.speed;
-      if(d.y>c.height+20){d.y=-20;d.eq=EQS[Math.floor(Math.random()*EQS.length)];}
+      if(d.y>H+20){d.y=-20;d.eq=EQS[Math.floor(Math.random()*EQS.length)];}
     });
+
     requestAnimationFrame(draw);
   }
-  resize();draw();addEventListener('resize',resize);
+
+  resize();
+  draw();
+  setTimeout(initBgSignal,1200);
+  addEventListener('resize',resize);
 })();
 
 // ═══ DATA ═════════════════════════════════════════
