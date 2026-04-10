@@ -4,419 +4,501 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IQ AI Lab</title>
-  <meta name="description" content="수학적 증명으로 AI의 본질을 탐구하는 딥다이브 연구소">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <style>
-    :root {
-      --bg: #05070d;
-      --surface: #090e1a;
-      --l0: #3B82F6;
-      --l1: #8B5CF6;
-      --l2: #F59E0B;
-      --l3: #22C55E;
-      --l4r: #EF4444;
-      --l4l: #F97316;
-      --l4c: #EC4899;
-      --l4n: #06B6D4;
-      --l5: #A78BFA;
-      --muted: #3a4a5a;
-      --text: #CBD5E1;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); font-family:'Noto Sans KR',sans-serif; }
-
-    #eq-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
-    header {
-      position:fixed; top:0; left:0; width:100%; z-index:20;
-      padding:14px 36px; display:flex; align-items:center; gap:16px;
-      background:linear-gradient(180deg,rgba(5,7,13,0.96) 55%,transparent 100%);
-    }
-    .brand { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:6px; color:var(--text); line-height:1; }
-    .brand-sub { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-top:2px; }
-    .h-sep { width:1px; height:32px; background:rgba(255,255,255,0.05); }
-    .h-desc { font-size:11.5px; color:var(--muted); line-height:1.7; font-weight:300; }
-    .h-desc em { color:var(--text); font-style:normal; }
-    .h-right { margin-left:auto; display:flex; gap:20px; }
-    .stat-n { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; color:var(--text); line-height:1; text-align:center; }
-    .stat-l { font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--muted); letter-spacing:1px; text-align:center; }
-
-    #gw { position:fixed; inset:0; z-index:1; }
-    #graph { width:100%; height:100%; cursor:grab; }
-    #graph:active { cursor:grabbing; }
-
-    #legend {
-      position:fixed; bottom:24px; left:36px; z-index:20;
-      display:flex; flex-direction:column; gap:5px;
-    }
-    .li { display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); }
-    .ld { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-
-    #hint { position:fixed; bottom:24px; right:36px; z-index:20; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); text-align:right; line-height:2; }
-
-    #tt { position:fixed; z-index:50; pointer-events:none; opacity:0; transition:opacity 0.15s; width:280px; }
-    .ttb { background:var(--surface); border-radius:10px; padding:14px 16px; border:1px solid rgba(255,255,255,0.06); }
-    #tt-layer { font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
-    #tt-name { font-size:13px; font-weight:500; color:var(--text); margin-bottom:6px; line-height:1.3; }
-    #tt-eq { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); margin-bottom:8px; line-height:1.8; }
-    #tt-desc { font-size:10.5px; color:var(--muted); line-height:1.7; margin-bottom:10px; font-weight:300; }
-    .ttf { display:flex; justify-content:flex-end; }
-    #tt-link { font-family:'JetBrains Mono',monospace; font-size:9px; text-decoration:none; }
-
-    #intro { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; background:var(--bg); transition:opacity 0.9s; }
-    .intro-title { font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:12px; color:var(--text); text-align:center; }
-    .intro-eq { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:2px; text-align:center; margin-top:10px; }
+    :root{--bg:#05070d;--surface:#090e1a;--muted:#3a4a5a;--text:#CBD5E1}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Noto Sans KR',sans-serif}
+    #eq-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+    #gw{position:fixed;inset:0;z-index:1;perspective:1200px;perspective-origin:50% 50%}
+    #graph-inner{width:100%;height:100%;transform-style:preserve-3d;will-change:transform;transition:transform .07s linear}
+    #graph{width:100%;height:100%;cursor:grab;display:block}
+    #graph:active{cursor:grabbing}
+    @keyframes signal-flow{to{stroke-dashoffset:-22}}
+    header{position:fixed;top:0;left:0;width:100%;z-index:20;padding:14px 36px;display:flex;align-items:center;gap:16px;background:linear-gradient(180deg,rgba(5,7,13,.96) 55%,transparent)}
+    .brand{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:6px;color:var(--text);line-height:1}
+    .brand-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:2px}
+    .h-sep{width:1px;height:32px;background:rgba(255,255,255,.05)}
+    .h-desc{font-size:11.5px;color:var(--muted);line-height:1.7;font-weight:300}
+    .h-desc em{color:var(--text);font-style:normal}
+    .h-right{margin-left:auto;display:flex;gap:22px}
+    .stat-n{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--text);line-height:1;text-align:center}
+    .stat-l{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;text-align:center}
+    #legend{position:fixed;bottom:24px;left:36px;z-index:20;display:flex;flex-direction:column;gap:5px}
+    .li{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9.5px;transition:opacity .25s}
+    .li-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    #hint{position:fixed;bottom:24px;right:36px;z-index:20;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-align:right;line-height:2}
+    #tt{position:fixed;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s;width:292px}
+    .ttb{background:rgba(9,14,26,.96);backdrop-filter:blur(14px);border-radius:12px;padding:16px 18px;border:1px solid rgba(255,255,255,.07);box-shadow:0 0 40px rgba(0,0,0,.55)}
+    #tt-layer{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+    #tt-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;line-height:1.3}
+    #tt-eq{font-family:'JetBrains Mono',monospace;font-size:9.5px;line-height:1.9;margin-bottom:8px;letter-spacing:.3px}
+    #tt-desc{font-size:10.5px;color:var(--muted);line-height:1.7;margin-bottom:10px;font-weight:300}
+    .ttf{display:flex;justify-content:flex-end}
+    #tt-link{font-family:'JetBrains Mono',monospace;font-size:9px;text-decoration:none}
+    #intro{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .9s}
+    .intro-t{font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:12px;color:var(--text);text-align:center}
+    .intro-s{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:3px;text-align:center;margin-top:10px}
   </style>
 </head>
 <body>
 
 <div id="intro">
   <div>
-    <div class="intro-title">IQ AI LAB</div>
-    <div class="intro-eq">∂L/∂w → proof → implement → repeat</div>
+    <div class="intro-t">IQ AI LAB</div>
+    <div class="intro-s">∂L/∂w → proof → implement → repeat</div>
   </div>
 </div>
 
-<canvas id="eq-canvas"></canvas>
+<canvas id="eq-bg"></canvas>
 
 <header>
-  <div>
-    <div class="brand">IQ AI LAB</div>
-    <div class="brand-sub">I QUESTION</div>
-  </div>
+  <div><div class="brand">IQ AI LAB</div><div class="brand-sub">I QUESTION</div></div>
   <div class="h-sep"></div>
-  <div class="h-desc">
-    <em>수학적 증명</em>으로 AI의 본질을 탐구합니다<br>
-    가정 → 보조정리 → 증명 → 구현 → 통찰
-  </div>
+  <div class="h-desc"><em>수학적 증명</em>으로 AI의 본질을 탐구합니다<br>가정 → 보조정리 → 증명 → 구현 → 통찰</div>
   <div class="h-right">
     <div><div class="stat-n">34</div><div class="stat-l">repos</div></div>
     <div><div class="stat-n">6</div><div class="stat-l">layers</div></div>
   </div>
 </header>
 
-<div id="gw"><svg id="graph"></svg></div>
+<div id="gw"><div id="graph-inner"><svg id="graph"></svg></div></div>
 
-<div id="tt">
-  <div class="ttb">
-    <div id="tt-layer"></div>
-    <div id="tt-name"></div>
-    <div id="tt-eq"></div>
-    <div id="tt-desc"></div>
-    <div class="ttf"><a id="tt-link" href="#" target="_blank">GitHub →</a></div>
-  </div>
-</div>
+<div id="tt"><div class="ttb">
+  <div id="tt-layer"></div><div id="tt-name"></div>
+  <div id="tt-eq"></div><div id="tt-desc"></div>
+  <div class="ttf"><a id="tt-link" href="#" target="_blank">GitHub →</a></div>
+</div></div>
 
 <div id="legend">
-  <div class="li"><div class="ld" style="background:#3B82F6"></div>Layer 0 — Mathematics</div>
-  <div class="li"><div class="ld" style="background:#8B5CF6"></div>Layer 1 — ML Theory</div>
-  <div class="li"><div class="ld" style="background:#F59E0B"></div>Layer 2 — Neural Networks</div>
-  <div class="li"><div class="ld" style="background:#22C55E"></div>Layer 3 — Architectures</div>
-  <div class="li"><div class="ld" style="background:#EF4444"></div>Layer 4 — Domain</div>
-  <div class="li"><div class="ld" style="background:#A78BFA"></div>Layer 5 — Systems</div>
+  <div class="li" data-layer="l0"><div class="li-dot" style="background:#3B82F6"></div><span style="color:#3B82F6">Layer 0</span><span style="color:var(--muted);margin-left:6px">Mathematics</span></div>
+  <div class="li" data-layer="l1"><div class="li-dot" style="background:#8B5CF6"></div><span style="color:#8B5CF6">Layer 1</span><span style="color:var(--muted);margin-left:6px">ML Theory</span></div>
+  <div class="li" data-layer="l2"><div class="li-dot" style="background:#F59E0B"></div><span style="color:#F59E0B">Layer 2</span><span style="color:var(--muted);margin-left:6px">Neural Networks</span></div>
+  <div class="li" data-layer="l3"><div class="li-dot" style="background:#22C55E"></div><span style="color:#22C55E">Layer 3</span><span style="color:var(--muted);margin-left:6px">Architectures</span></div>
+  <div class="li" data-layer="l4"><div class="li-dot" style="background:#EF4444"></div><span style="color:#EF4444">Layer 4</span><span style="color:var(--muted);margin-left:6px">Domain</span></div>
+  <div class="li" data-layer="l5"><div class="li-dot" style="background:#A78BFA"></div><span style="color:#A78BFA">Layer 5</span><span style="color:var(--muted);margin-left:6px">Systems</span></div>
 </div>
-
-<div id="hint">scroll · zoom<br>drag · pan<br>click · open</div>
+<div id="hint">scroll · zoom<br>drag · pan<br>click · cascade</div>
 
 <script>
-// ── FALLING EQUATIONS ──────────────────────────────────────────────────────
-(function() {
-  const c = document.getElementById('eq-canvas');
-  const ctx = c.getContext('2d');
-  const EQS = [
-    '∂L/∂w','σ(Wx+b)','∇θJ(θ)','E[Rₜ]','V*(s)','π*(a|s)',
-    'KL(p‖q)','H(X)','∑wᵢxᵢ','argmax Q','P(y|x)',
-    'δ=r+γV(s\')','ELBO','Aᵀ=UΣVᵀ','∫p(x)dx=1',
-    'J(π)=Eτ[R]','det(J)','‖w‖²','tanh(z)','ReLU(x)',
-    'βKL','L=−logP','α∇J','μ,σ²','Σ⁻¹','tr(A)',
-  ];
-  let drops = [];
-
-  function resize() {
-    c.width = innerWidth; c.height = innerHeight;
-    drops = Array.from({length:28}, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      eq: EQS[Math.floor(Math.random()*EQS.length)],
-      speed: Math.random()*0.35+0.08,
-      opacity: Math.random()*0.12+0.03,
-      size: Math.random()*3+9,
+// ═══ FALLING EQUATIONS — margins only ════════════
+(function(){
+  const c=document.getElementById('eq-bg'),ctx=c.getContext('2d');
+  const EQS=['∂L/∂w','σ(z)','∇θJ','E[Rₜ]','V*(s)','π*(a|s)','KL(p‖q)','H(X)',
+    'argmax Q','ELBO','Aᵀ=UΣVᵀ','∫p dx=1','J(π)','det(J)','‖w‖²',
+    'tanh(z)','βKL','α∇J','Σ⁻¹','tr(A)','ReLU','softmax','∑wᵢxᵢ'];
+  let drops=[];
+  function resize(){
+    c.width=innerWidth; c.height=innerHeight;
+    const mW=innerWidth*.11;
+    drops=Array.from({length:24},()=>({
+      x:Math.random()<.5?Math.random()*mW:innerWidth-mW+Math.random()*mW,
+      y:Math.random()*c.height,
+      eq:EQS[Math.floor(Math.random()*EQS.length)],
+      speed:Math.random()*.26+.06,
+      opacity:Math.random()*.065+.02,
+      size:Math.floor(Math.random()*4)+9,
     }));
   }
-
-  function draw() {
+  function draw(){
     ctx.clearRect(0,0,c.width,c.height);
-    drops.forEach(d => {
-      ctx.font = `${d.size}px JetBrains Mono, monospace`;
-      ctx.fillStyle = `rgba(59,130,246,${d.opacity})`;
-      ctx.fillText(d.eq, d.x, d.y);
-      d.y += d.speed;
-      if (d.y > c.height + 30) {
-        d.y = -20;
-        d.x = Math.random() * c.width;
-        d.eq = EQS[Math.floor(Math.random()*EQS.length)];
-      }
+    drops.forEach(d=>{
+      ctx.font=`${d.size}px JetBrains Mono,monospace`;
+      ctx.fillStyle=`rgba(59,130,246,${d.opacity})`;
+      ctx.fillText(d.eq,d.x,d.y);
+      d.y+=d.speed;
+      if(d.y>c.height+20){d.y=-20;d.eq=EQS[Math.floor(Math.random()*EQS.length)];}
     });
     requestAnimationFrame(draw);
   }
-  resize(); draw();
-  addEventListener('resize', resize);
+  resize();draw();addEventListener('resize',resize);
 })();
 
-// ── DATA ───────────────────────────────────────────────────────────────────
-const BASE = 'https://github.com/iq-ai-lab';
-
-const LAYERS = {
-  l0: { label:'Layer 0 · Mathematics', col:'#3B82F6', short:'Math' },
-  l1: { label:'Layer 1 · ML Theory',   col:'#8B5CF6', short:'ML Theory' },
-  l2: { label:'Layer 2 · Neural Nets', col:'#F59E0B', short:'Neural Nets' },
-  l3: { label:'Layer 3 · Architectures',col:'#22C55E',short:'Architectures' },
-  l4: { label:'Layer 4 · Domain',       col:'#EF4444', short:'Domain' },
-  l5: { label:'Layer 5 · Systems',      col:'#A78BFA', short:'Systems' },
+// ═══ DATA ═════════════════════════════════════════
+const BASE='https://github.com/iq-ai-lab';
+const LAYERS={
+  l0:{label:'Layer 0 · Mathematics', col:'#3B82F6',short:'MATH',  pulseMs:3200},
+  l1:{label:'Layer 1 · ML Theory',   col:'#8B5CF6',short:'ML',    pulseMs:2700},
+  l2:{label:'Layer 2 · Neural Nets', col:'#F59E0B',short:'NN',    pulseMs:2200},
+  l3:{label:'Layer 3 · Architectures',col:'#22C55E',short:'ARCH', pulseMs:1900},
+  l4:{label:'Layer 4 · Domain',      col:'#EF4444',short:'DOMAIN',pulseMs:1600},
+  l5:{label:'Layer 5 · Systems',     col:'#A78BFA',short:'SYS',   pulseMs:1300},
 };
+const LAYER_ORDER=['l0','l1','l2','l3','l4','l5'];
 
-const REPOS = [
-  // Layer 0
-  { id:'la',  layer:'l0', short:'Linear Algebra',   label:'Linear Algebra Deep Dive',    eq:'Aᵀ=UΣVᵀ  ·  det(A)  ·  λv=Av', url:`${BASE}/linear-algebra-deep-dive`,              desc:'벡터공간, 고유값 분해, SVD, PCA 증명, 텐서' },
-  { id:'pt',  layer:'l0', short:'Prob Theory',       label:'Probability Theory Deep Dive', eq:'P(A∩B)=P(A|B)P(B)  ·  E[X]', url:`${BASE}/probability-theory-deep-dive`,          desc:'측도 기반 확률론, 마팅게일, 수렴 4종' },
-  { id:'ms',  layer:'l0', short:'Math Stats',        label:'Mathematical Statistics',      eq:'MLE: θ̂=argmax logL(θ)',       url:`${BASE}/mathematical-statistics-deep-dive`,    desc:'MLE/MAP 유도, 가설검정, 점근이론' },
-  { id:'co',  layer:'l0', short:'Calculus & Opt',    label:'Calculus & Optimization',      eq:'∇f=0  ·  ∂f/∂xᵢ  ·  H≻0',    url:`${BASE}/calculus-optimization-deep-dive`,       desc:'편미분, 야코비안, 헤시안, 라그랑주' },
-  { id:'cx',  layer:'l0', short:'Convex Opt',        label:'Convex Optimization Deep Dive',eq:'KKT: ∇f+μᵀ∇g=0  ·  dual',    url:`${BASE}/convex-optimization-deep-dive`,         desc:'볼록 집합/함수, KKT 조건, 쌍대이론' },
-  { id:'it',  layer:'l0', short:'Info Theory',       label:'Information Theory Deep Dive', eq:'H(X)=−∑p log p  ·  KL(p‖q)', url:`${BASE}/information-theory-deep-dive`,          desc:'Shannon Entropy, KL-Divergence, 상호정보량' },
-  { id:'sp',  layer:'l0', short:'Stoch Processes',   label:'Stochastic Processes',         eq:'P(Xₙ₊₁|Xₙ)=P(Xₙ₊₁|X₀..Xₙ)', url:`${BASE}/stochastic-processes-deep-dive`,       desc:'마르코프 체인, 브라운 운동, MCMC' },
-  { id:'sd',  layer:'l0', short:'SDE',               label:'Stochastic Diff. Equations',   eq:'dX=μdt+σdW  ·  Itô formula',  url:`${BASE}/sde-deep-dive`,                         desc:'이토 적분, SDE, Fokker-Planck 방정식' },
-  { id:'fa',  layer:'l0', short:'Functional Analysis',label:'Functional Analysis',         eq:'‖f‖² = ⟨f,f⟩  ·  RKHS',      url:`${BASE}/functional-analysis-deep-dive`,         desc:'힐베르트 공간, 스펙트럴 이론, RKHS' },
-  { id:'ig',  layer:'l0', short:'Info Geometry',     label:'Information Geometry',         eq:'Fᵢⱼ=E[∂ᵢlog p·∂ⱼlog p]',     url:`${BASE}/information-geometry-deep-dive`,        desc:'Fisher 정보 행렬, Natural Gradient' },
-  // Layer 1
-  { id:'mf',  layer:'l1', short:'ML Fundamentals',   label:'ML Fundamentals Deep Dive',    eq:'ŷ=Xβ  ·  β=(XᵀX)⁻¹Xᵀy',     url:`${BASE}/ml-fundamentals-deep-dive`,             desc:'선형회귀 Normal Eq 유도, SVM, 앙상블' },
-  { id:'sl',  layer:'l1', short:'Statistical Learning',label:'Statistical Learning Theory', eq:'P(err)≤ε : PAC  ·  VC dim',   url:`${BASE}/statistical-learning-theory-deep-dive`,desc:'PAC Learning, VC 차원, Rademacher 복잡도' },
-  { id:'km',  layer:'l1', short:'Kernel Methods',    label:'Kernel Methods Deep Dive',      eq:'K(x,x\')=⟨φ(x),φ(x\')⟩',      url:`${BASE}/kernel-methods-deep-dive`,              desc:'Mercer 정리, RKHS, SVM 쌍대, GP' },
-  { id:'bm',  layer:'l1', short:'Bayesian ML',       label:'Bayesian ML Deep Dive',         eq:'P(θ|D)∝P(D|θ)P(θ)',           url:`${BASE}/bayesian-ml-deep-dive`,                 desc:'베이지안 추론, ELBO 유도, MCMC' },
-  { id:'gm',  layer:'l1', short:'Graphical Models',  label:'Graphical Models Deep Dive',    eq:'P(X)=∏ψc(Xc)/Z',             url:`${BASE}/graphical-models-deep-dive`,            desc:'베이지안 네트워크, 믿음 전파' },
-  // Layer 2
-  { id:'nn',  layer:'l2', short:'NN Theory',         label:'Neural Network Theory',         eq:'δˡ=(Wˡ⁺¹)ᵀδˡ⁺¹⊙σ\'(zˡ)',     url:`${BASE}/neural-network-theory-deep-dive`,       desc:'범용 근사 정리, 역전파 완전 유도' },
-  { id:'ot',  layer:'l2', short:'Optimization',      label:'Optimization Theory Deep Dive', eq:'θₜ₊₁=θₜ−α∇L  ·  Adam',       url:`${BASE}/optimization-theory-deep-dive`,         desc:'SGD 수렴 분석, Adam 수렴 반례' },
-  { id:'gt',  layer:'l2', short:'Generalization',    label:'Generalization Theory',         eq:'NTK: fθ(x)≈f₀(x)+Θ(x,·)α',  url:`${BASE}/generalization-theory-deep-dive`,       desc:'Double Descent, NTK, Grokking' },
-  { id:'rt',  layer:'l2', short:'Regularization',    label:'Regularization Theory',         eq:'L̃=L+λ‖w‖²  ·  Dropout',      url:`${BASE}/regularization-theory-deep-dive`,       desc:'L1/L2 베이즈 해석, BatchNorm 증명' },
-  // Layer 3
-  { id:'cn',  layer:'l3', short:'CNN',               label:'CNN Deep Dive',                 eq:'(f*g)[n]=∑f[m]g[n-m]',        url:`${BASE}/cnn-deep-dive`,                         desc:'Convolution 등변성, ResNet 항등 근사 이론' },
-  { id:'rn',  layer:'l3', short:'RNN & LSTM',        label:'RNN & LSTM Deep Dive',          eq:'hₜ=tanh(Wxₜ+Uhₜ₋₁+b)',       url:`${BASE}/rnn-lstm-deep-dive`,                    desc:'BPTT 완전 유도, Vanishing Gradient 증명' },
-  { id:'tr',  layer:'l3', short:'Transformer',       label:'Transformer Deep Dive',         eq:'Attn=softmax(QKᵀ/√d)V',       url:`${BASE}/transformer-deep-dive`,                 desc:'Attention 수식 완전 분해, √d 근거' },
-  { id:'gn',  layer:'l3', short:'GNN',               label:'Graph Neural Network',          eq:'h^(l+1)=σ(D̃⁻¹ÃH^(l)W^(l))', url:`${BASE}/gnn-deep-dive`,                         desc:'그래프 라플라시안 유도, WL 검사' },
-  { id:'gv',  layer:'l3', short:'Generative Models', label:'Generative Model Deep Dive',    eq:'ELBO=E[logp]-KL(q‖p)',        url:`${BASE}/generative-model-deep-dive`,            desc:'GAN minimax, VAE ELBO 완전 유도' },
-  // Layer 4
-  { id:'rf',  layer:'l4', short:'RL Foundations',    label:'RL Foundations Deep Dive',      eq:'V*(s)=maxₐ[r+γ∑V*(s\')]',     url:`${BASE}/rl-foundations-deep-dive`,              desc:'MDP 공리적 정의, 벨만 방정식 완전 유도' },
-  { id:'mfr', layer:'l4', short:'Model-Free RL',     label:'Model-Free RL Deep Dive',       eq:'Q(s,a)←Q+α[r+γmaxQ\'-Q]',    url:`${BASE}/model-free-rl-deep-dive`,               desc:'Q-Learning 수렴 증명(Robbins-Monro)' },
-  { id:'dr',  layer:'l4', short:'Deep RL',           label:'Deep RL Deep Dive',             eq:'L=(r+γmaxQ\'−Q(s,a;θ))²',    url:`${BASE}/deep-rl-deep-dive`,                     desc:'DQN 경험 재생 이론, Double DQN 편향 증명' },
-  { id:'pg',  layer:'l4', short:'Policy Gradient',   label:'Policy Gradient Deep Dive',     eq:'∇J=E[∇log π(a|s)·A(s,a)]',   url:`${BASE}/policy-gradient-deep-dive`,             desc:'REINFORCE 완전 유도, GAE λ-수익 유도' },
-  { id:'ar',  layer:'l4', short:'Advanced RL',       label:'Advanced RL Deep Dive',         eq:'PPO: clip(rₜ,1-ε,1+ε)Aₜ',   url:`${BASE}/advanced-rl-deep-dive`,                 desc:'TRPO 단조 개선 이론, SAC 엔트로피 최대화' },
-  { id:'lp',  layer:'l4', short:'LLM Pretraining',   label:'LLM Pretraining Deep Dive',     eq:'L∝N^0.34·D^0.28 (Chinchilla)',url:`${BASE}/llm-pretraining-deep-dive`,             desc:'Scaling Law, 학습 안정성, 데이터 혼합' },
-  { id:'la2', layer:'l4', short:'LLM Alignment',     label:'LLM Alignment Deep Dive',       eq:'DPO: logσ(β log π*/πref)',    url:`${BASE}/llm-alignment-deep-dive`,               desc:'RLHF, DPO Bradley-Terry 유도' },
-  { id:'df',  layer:'l4', short:'Diffusion Models',  label:'Diffusion Model Deep Dive',     eq:'p(xₜ₋₁|xₜ)=N(μθ,Σθ)',       url:`${BASE}/diffusion-model-deep-dive`,             desc:'DDPM 완전 유도, Score Matching' },
-  // Layer 5
-  { id:'pi',  layer:'l5', short:'PyTorch Internals', label:'PyTorch Internals Deep Dive',   eq:'∂L/∂x = Jᵀ·v (VJP)',         url:`${BASE}/pytorch-internals-deep-dive`,           desc:'Autograd 야코비안 벡터곱, CUDA 커널' },
-  { id:'ef',  layer:'l5', short:'Efficient ML',      label:'Efficient ML Deep Dive',        eq:'FlashAttn: O(N) memory',      url:`${BASE}/efficient-ml-deep-dive`,                desc:'Pruning/Quantization/Distillation 수학' },
+const REPOS=[
+  {id:'la', layer:'l0',short:'Linear Algebra',   label:'Linear Algebra Deep Dive',        eq:'Aᵀ=UΣVᵀ  ·  det(A)  ·  λv=Av',       url:`${BASE}/linear-algebra-deep-dive`,              desc:'벡터공간, 고유값 분해, SVD, PCA 증명, 텐서'},
+  {id:'pt', layer:'l0',short:'Prob Theory',       label:'Probability Theory Deep Dive',    eq:'P(A∩B)=P(A|B)P(B)  ·  E[X|Y]',        url:`${BASE}/probability-theory-deep-dive`,          desc:'측도 기반 확률론, 마팅게일, 수렴 4종'},
+  {id:'ms', layer:'l0',short:'Math Stats',        label:'Mathematical Statistics',         eq:'θ̂_MLE = argmax ℓ(θ)',                  url:`${BASE}/mathematical-statistics-deep-dive`,    desc:'MLE/MAP 유도, 가설검정, 점근이론'},
+  {id:'co', layer:'l0',short:'Calculus & Opt',    label:'Calculus & Optimization',         eq:'∇f=0  ·  ∂²f/∂xᵢ∂xⱼ  ·  H≻0',       url:`${BASE}/calculus-optimization-deep-dive`,       desc:'편미분, 야코비안, 헤시안, 라그랑주'},
+  {id:'cx', layer:'l0',short:'Convex Opt',        label:'Convex Optimization Deep Dive',   eq:'KKT: ∇f+μᵀ∇g=0  ·  dual gap',        url:`${BASE}/convex-optimization-deep-dive`,         desc:'볼록 집합/함수, KKT 조건, 쌍대이론'},
+  {id:'it', layer:'l0',short:'Info Theory',       label:'Information Theory Deep Dive',    eq:'H(X)=−∑p log p  ·  I(X;Y)',           url:`${BASE}/information-theory-deep-dive`,          desc:'Shannon Entropy, KL-Divergence, 상호정보량'},
+  {id:'sp', layer:'l0',short:'Stoch Processes',   label:'Stochastic Processes',            eq:'P(Xₙ₊₁|X₀..Xₙ)=P(Xₙ₊₁|Xₙ)',          url:`${BASE}/stochastic-processes-deep-dive`,        desc:'마르코프 체인, 브라운 운동, MCMC'},
+  {id:'sde',layer:'l0',short:'SDE',               label:'Stochastic Diff. Equations',      eq:'dX=μdt+σdW  ·  Itô lemma',            url:`${BASE}/sde-deep-dive`,                         desc:'이토 적분, SDE, Fokker-Planck 방정식'},
+  {id:'fa', layer:'l0',short:'Functional Analysis',label:'Functional Analysis',            eq:'‖f‖²=⟨f,f⟩  ·  T:H→H  ·  RKHS',      url:`${BASE}/functional-analysis-deep-dive`,         desc:'힐베르트 공간, 스펙트럴 이론, RKHS'},
+  {id:'ig', layer:'l0',short:'Info Geometry',     label:'Information Geometry',            eq:'Fᵢⱼ=E[∂ᵢlog p · ∂ⱼlog p]',            url:`${BASE}/information-geometry-deep-dive`,        desc:'통계다양체, Fisher 정보 행렬, Natural Gradient'},
+  {id:'mf', layer:'l1',short:'ML Fundamentals',   label:'ML Fundamentals Deep Dive',       eq:'β=(XᵀX)⁻¹Xᵀy  ·  bias-var decomp',   url:`${BASE}/ml-fundamentals-deep-dive`,             desc:'선형회귀 Normal Eq 유도, SVM, 앙상블 수렴'},
+  {id:'sl', layer:'l1',short:'Stat Learning',     label:'Statistical Learning Theory',     eq:'PAC: P(err≤ε)≥1−δ  ·  VC dim',       url:`${BASE}/statistical-learning-theory-deep-dive`,desc:'PAC Learning, VC 차원, Rademacher 복잡도'},
+  {id:'km', layer:'l1',short:'Kernel Methods',    label:'Kernel Methods Deep Dive',        eq:'K(x,x\')=⟨φ(x),φ(x\')⟩  ·  Mercer',  url:`${BASE}/kernel-methods-deep-dive`,              desc:'Mercer 정리, RKHS, SVM 쌍대 유도, GP'},
+  {id:'bm', layer:'l1',short:'Bayesian ML',       label:'Bayesian ML Deep Dive',           eq:'P(θ|D)∝P(D|θ)P(θ)  ·  ELBO',          url:`${BASE}/bayesian-ml-deep-dive`,                 desc:'베이지안 추론, 변분 베이즈, ELBO 유도, MCMC'},
+  {id:'gmo',layer:'l1',short:'Graphical Models',  label:'Graphical Models Deep Dive',      eq:'P(X)=∏ψc(Xc)/Z  ·  BP algo',         url:`${BASE}/graphical-models-deep-dive`,            desc:'베이지안 네트워크, 마르코프 필드, 믿음 전파'},
+  {id:'nn', layer:'l2',short:'NN Theory',         label:'Neural Network Theory',           eq:'δˡ=(Wˡ⁺¹)ᵀδˡ⁺¹⊙σ\'(zˡ)  ·  UAT',    url:`${BASE}/neural-network-theory-deep-dive`,       desc:'범용 근사 정리 증명, 역전파 완전 유도'},
+  {id:'ot', layer:'l2',short:'Optimization',      label:'Optimization Theory Deep Dive',   eq:'θₜ₊₁=θₜ−αₜ∇L  ·  Adam mₜ/√vₜ',      url:`${BASE}/optimization-theory-deep-dive`,         desc:'SGD 수렴 분석, Adam 수렴 반례, LR Scheduler'},
+  {id:'gen',layer:'l2',short:'Generalization',    label:'Generalization Theory',           eq:'NTK: f_θ≈f₀+Θ(x,·)α  ·  DD',        url:`${BASE}/generalization-theory-deep-dive`,       desc:'Double Descent, NTK, Grokking, Lottery Ticket'},
+  {id:'reg',layer:'l2',short:'Regularization',    label:'Regularization Theory',           eq:'L̃=L+λ‖w‖²  ·  E[Dropout]=p·f',       url:`${BASE}/regularization-theory-deep-dive`,       desc:'L1/L2 베이즈 해석, Dropout 앙상블, BatchNorm 증명'},
+  {id:'cn', layer:'l3',short:'CNN',               label:'CNN Deep Dive',                   eq:'(f★g)[n]=∑f[m]g[n−m]  ·  equivar',   url:`${BASE}/cnn-deep-dive`,                         desc:'Convolution 등변성, Receptive Field, ResNet 항등'},
+  {id:'rnn',layer:'l3',short:'RNN & LSTM',        label:'RNN & LSTM Deep Dive',            eq:'hₜ=tanh(Wxₜ+Uhₜ₋₁+b)  ·  BPTT',      url:`${BASE}/rnn-lstm-deep-dive`,                    desc:'BPTT 완전 유도, Vanishing Gradient 스펙트럴'},
+  {id:'tr', layer:'l3',short:'Transformer',       label:'Transformer Deep Dive',           eq:'Attn=softmax(QKᵀ/√d)V  ·  MHA',      url:`${BASE}/transformer-deep-dive`,                 desc:'Attention 수식 완전 분해, √d 근거, Linear Attn'},
+  {id:'gnn',layer:'l3',short:'GNN',               label:'Graph Neural Network',            eq:'h^(l+1)=σ(D̃⁻¹ÃH^(l)W^(l))  ·  WL',  url:`${BASE}/gnn-deep-dive`,                         desc:'그래프 라플라시안 유도, Message Passing, WL 검사'},
+  {id:'gv', layer:'l3',short:'Generative Models', label:'Generative Model Deep Dive',      eq:'ELBO=Eq[log p]−KL(q‖p)  ·  GAN',     url:`${BASE}/generative-model-deep-dive`,            desc:'GAN minimax 수렴, VAE ELBO 완전 유도, NF'},
+  {id:'rf', layer:'l4',short:'RL Foundations',    label:'RL Foundations Deep Dive',        eq:'V*(s)=maxₐ[r+γΣV*(s\')]  ·  MDP',     url:`${BASE}/rl-foundations-deep-dive`,              desc:'MDP 공리적 정의, 벨만 방정식 완전 유도'},
+  {id:'mfr',layer:'l4',short:'Model-Free RL',     label:'Model-Free RL Deep Dive',         eq:'Q←Q+α[r+γmaxQ\'−Q]  ·  TD(λ)',       url:`${BASE}/model-free-rl-deep-dive`,               desc:'Q-Learning 수렴 증명 (Robbins-Monro 조건)'},
+  {id:'dr', layer:'l4',short:'Deep RL',           label:'Deep RL Deep Dive',               eq:'L=(r+γmaxQ\'−Q(s,a;θ))²  ·  DQN',    url:`${BASE}/deep-rl-deep-dive`,                     desc:'DQN 경험 재생 이론, Double DQN 과대추정 증명'},
+  {id:'pg', layer:'l4',short:'Policy Gradient',   label:'Policy Gradient Deep Dive',       eq:'∇J=Eτ[∇log π(a|s)·A(s,a)]  ·  GAE',  url:`${BASE}/policy-gradient-deep-dive`,             desc:'REINFORCE 완전 유도, 정책 기울기 정리, GAE'},
+  {id:'ar', layer:'l4',short:'Advanced RL',       label:'Advanced RL Deep Dive',           eq:'PPO: clip(rₜ,1±ε)Aₜ  ·  SAC H',      url:`${BASE}/advanced-rl-deep-dive`,                 desc:'TRPO 단조 개선 이론, PPO 클리핑 근거, SAC'},
+  {id:'lp', layer:'l4',short:'LLM Pretraining',   label:'LLM Pretraining Deep Dive',       eq:'L∝N^0.34·D^0.28  (Chinchilla law)',   url:`${BASE}/llm-pretraining-deep-dive`,             desc:'Scaling Law 수식, 학습 안정성, 데이터 혼합 이론'},
+  {id:'la2',layer:'l4',short:'LLM Alignment',     label:'LLM Alignment Deep Dive',         eq:'DPO: log σ(β log π*/πref)  ·  RLHF',  url:`${BASE}/llm-alignment-deep-dive`,               desc:'RLHF 보상 모델링, DPO Bradley-Terry 유도'},
+  {id:'df', layer:'l4',short:'Diffusion Models',  label:'Diffusion Model Deep Dive',       eq:'p(xₜ₋₁|xₜ)=N(μθ,Σθ)  ·  DDIM',     url:`${BASE}/diffusion-model-deep-dive`,             desc:'DDPM Forward/Reverse 완전 유도, Score Matching'},
+  {id:'pi', layer:'l5',short:'PyTorch Internals', label:'PyTorch Internals Deep Dive',     eq:'∂L/∂x=Jᵀ·v  ·  VJP  ·  CUDA kernel', url:`${BASE}/pytorch-internals-deep-dive`,           desc:'Autograd 야코비안 벡터곱, CUDA 커널, 혼합 정밀도'},
+  {id:'ef', layer:'l5',short:'Efficient ML',      label:'Efficient ML Deep Dive',          eq:'FlashAttn: O(N)mem  ·  LoRA: ΔW=BA',  url:`${BASE}/efficient-ml-deep-dive`,                desc:'Pruning/Quantization/Distillation 수학, vLLM'},
 ];
 
-// ── LAYOUT — layered pyramid ────────────────────────────────────────────────
-const W = innerWidth, H = innerHeight;
-const CX = W / 2;
-
-const LAYER_ORDER = ['l0','l1','l2','l3','l4','l5'];
-// Layer 0 at bottom, Layer 5 at top
-// Multi-row layer config: y = first row y, rowH = row spacing
-const LAYER_CONFIG = {
-  l5: { y: H * 0.10, rows: 1 },
-  l4: { y: H * 0.23, rows: 2, rowH: H * 0.08 },
-  l3: { y: H * 0.44, rows: 1 },
-  l2: { y: H * 0.57, rows: 1 },
-  l1: { y: H * 0.69, rows: 1 },
-  l0: { y: H * 0.79, rows: 2, rowH: H * 0.08 },
+// ═══ LAYOUT ════════════════════════════════════════
+const W=innerWidth,H=innerHeight,CX=W/2;
+const NODE_R=18;
+const LAYER_CONFIG={
+  l5:{y:H*.10,rows:1},
+  l4:{y:H*.23,rows:2,rowH:H*.086},
+  l3:{y:H*.43,rows:1},
+  l2:{y:H*.55,rows:1},
+  l1:{y:H*.67,rows:1},
+  l0:{y:H*.77,rows:2,rowH:H*.086},
 };
 
-// For legend/line labels use first row y
-const LAYER_Y = Object.fromEntries(
-  Object.entries(LAYER_CONFIG).map(([k,v]) => [k, v.y])
-);
-
-function buildGraph() {
-  const nodes = [], byId = {}, links = [];
-
-  REPOS.forEach(r => {
-    const cfg = LAYER_CONFIG[r.layer];
-    const layerRepos = REPOS.filter(x => x.layer === r.layer);
-    const total = layerRepos.length;
-    const i = layerRepos.indexOf(r);
-
-    let x, y;
-    if (cfg.rows === 2) {
-      // Split into two rows: row0 = ceil(total/2), row1 = rest
-      const row0Count = Math.ceil(total / 2);
-      const row = i < row0Count ? 0 : 1;
-      const idxInRow = row === 0 ? i : i - row0Count;
-      const countInRow = row === 0 ? row0Count : total - row0Count;
-      const spread = Math.min(W * 0.80, countInRow * 120);
-      x = CX - spread/2 + (spread / (countInRow - 1 || 1)) * idxInRow;
-      y = cfg.y + row * cfg.rowH;
-    } else {
-      const spread = Math.min(W * 0.84, total * 120);
-      x = CX - spread/2 + (spread / (total - 1 || 1)) * i;
-      y = cfg.y;
+function buildGraph(){
+  const nodes=[],links=[],byId={};
+  REPOS.forEach(r=>{
+    const cfg=LAYER_CONFIG[r.layer];
+    const lr=REPOS.filter(x=>x.layer===r.layer),total=lr.length,i=lr.indexOf(r);
+    let x,y;
+    if(cfg.rows===2){
+      const r0=Math.ceil(total/2),row=i<r0?0:1,idx=row===0?i:i-r0,cnt=row===0?r0:total-r0;
+      const spread=Math.min(W*.83,cnt*148);
+      x=CX-spread/2+(spread/(cnt-1||1))*idx; y=cfg.y+row*cfg.rowH;
+    }else{
+      const spread=Math.min(W*.83,total*148);
+      x=CX-spread/2+(spread/(total-1||1))*i; y=cfg.y;
     }
-
-    const node = {...r, x, y};
-    nodes.push(node); byId[r.id] = node;
+    const node={...r,type:'repo',x,y};
+    nodes.push(node); byId[r.id]=node;
   });
-
-  // Dependency links: each layer connects to next
-  const layerGroups = {};
-  LAYER_ORDER.forEach(l => { layerGroups[l] = nodes.filter(n => n.layer === l); });
-  // Dense links between layers — all-to-all style
-  const pairs = [['l0','l1'],['l1','l2'],['l2','l3'],['l3','l4'],['l4','l5']];
-  pairs.forEach(([a,b]) => {
-    const as = layerGroups[a], bs = layerGroups[b];
-    as.forEach(an => {
-      bs.forEach(bn => {
-        links.push({s: an.id, t: bn.id, layerA: a, layerB: b});
-      });
+  // Sparse connections: each node → 3 nearest in adjacent layer
+  const pairs=[['l0','l1'],['l1','l2'],['l2','l3'],['l3','l4'],['l4','l5']];
+  pairs.forEach(([a,b])=>{
+    const as=nodes.filter(n=>n.layer===a),bs=nodes.filter(n=>n.layer===b);
+    as.forEach(an=>{
+      [...bs].sort((x,y)=>Math.abs(x.x-an.x)-Math.abs(y.x-an.x)).slice(0,3)
+        .forEach(bn=>links.push({s:an.id,t:bn.id,la:a,lb:b}));
     });
   });
-
-  return {nodes, links, byId};
+  return{nodes,links,byId};
 }
+const{nodes,links,byId}=buildGraph();
+const nodeGMap={};
 
-const {nodes, links, byId} = buildGraph();
-
-// ── SVG ────────────────────────────────────────────────────────────────────
-const svg = d3.select('#graph').attr('viewBox',`0 0 ${W} ${H}`);
-const root = svg.append('g');
-
-const zoom = d3.zoom().scaleExtent([0.2,4]).on('zoom', e => root.attr('transform', e.transform));
+// ═══ SVG ══════════════════════════════════════════
+const svg=d3.select('#graph').attr('viewBox',`0 0 ${W} ${H}`);
+const root=svg.append('g');
+const zoom=d3.zoom().scaleExtent([.15,4.2]).on('zoom',e=>root.attr('transform',e.transform));
 svg.call(zoom);
-const initScale = 0.62;
-const initX = W * (1 - initScale) / 2;
-const initY = H * (1 - initScale) / 2;
-svg.call(zoom.transform, d3.zoomIdentity.translate(initX, initY).scale(initScale));
+svg.call(zoom.transform,d3.zoomIdentity.translate(W*(1-.56)/2,H*(1-.56)/2).scale(.56));
 
-const defs = svg.append('defs');
-Object.entries(LAYERS).forEach(([k,v]) => {
-  const f = defs.append('filter').attr('id',`gl-${k}`)
+const defs=svg.append('defs');
+// Per-layer glow filters
+Object.entries(LAYERS).forEach(([k,v])=>{
+  const f=defs.append('filter').attr('id',`gl-${k}`)
     .attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
-  f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','5').attr('result','blur');
-  const m = f.append('feMerge');
+  f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','8').attr('result','blur');
+  const m=f.append('feMerge');
   m.append('feMergeNode').attr('in','blur');
   m.append('feMergeNode').attr('in','SourceGraphic');
 });
+// Cursor aurora
+const ag=defs.append('radialGradient').attr('id','aurora-g').attr('cx','50%').attr('cy','50%').attr('r','50%');
+ag.append('stop').attr('offset','0%').attr('stop-color','#3B82F6').attr('stop-opacity',.055);
+ag.append('stop').attr('offset','100%').attr('stop-color','#3B82F6').attr('stop-opacity',0);
+const af2=defs.append('filter').attr('id','aurora-f').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+af2.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','30');
 
-// Layer label lines
-LAYER_ORDER.forEach(lk => {
-  const meta = LAYERS[lk];
-  const y = LAYER_Y[lk];
-  root.append('line')
-    .attr('x1', 36).attr('y1', y).attr('x2', W-36).attr('y2', y)
-    .attr('stroke', meta.col).attr('stroke-width', 0.3).attr('stroke-opacity', 0.15)
-    .attr('stroke-dasharray','2,6');
-
-  root.append('text')
-    .attr('x', 42).attr('y', y - 10)
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size','8.5px')
-    .attr('fill', meta.col).attr('opacity', 0.45).attr('letter-spacing','1.5')
-    .text(meta.short.toUpperCase());
+// ── LAYER BANDS ──────────────────────────────────
+Object.entries(LAYER_CONFIG).forEach(([lk,cfg])=>{
+  const col=LAYERS[lk].col;
+  const bH=cfg.rows===2?(cfg.rowH+NODE_R*2+14):(NODE_R*2+12);
+  root.append('rect').attr('x',0).attr('y',cfg.y-NODE_R-6)
+    .attr('width',W).attr('height',bH)
+    .attr('fill',col).attr('opacity',.032).attr('pointer-events','none');
+  root.append('text').attr('x',26).attr('y',cfg.y+4)
+    .attr('font-family','JetBrains Mono,monospace').attr('font-size','8.5px')
+    .attr('fill',col).attr('opacity',.38).attr('letter-spacing','2')
+    .text(LAYERS[lk].short);
 });
 
-// Links
-root.append('g').selectAll('line').data(links).join('line')
+// ── CURSOR AURORA ────────────────────────────────
+const aurora=root.insert('g','*').append('circle')
+  .attr('r',155).attr('fill','url(#aurora-g)').attr('filter','url(#aurora-f)')
+  .attr('opacity',0).attr('pointer-events','none');
+
+// ── BASE CONNECTIONS (sparse, very faint) ─────────
+const baseEdgeG=root.append('g');
+baseEdgeG.selectAll('line').data(links).join('line')
   .attr('x1',d=>byId[d.s].x).attr('y1',d=>byId[d.s].y)
   .attr('x2',d=>byId[d.t].x).attr('y2',d=>byId[d.t].y)
-  .attr('stroke', d => LAYERS[byId[d.s].layer].col)
-  .attr('stroke-width', 0.6)
-  .attr('stroke-opacity', 0.28)
-  .attr('stroke-dasharray','2,4')
-  .style('opacity',0)
-  .transition().duration(1000).delay(700).style('opacity',1);
+  .attr('stroke','rgba(110,155,255,0.065)').attr('stroke-width',.8)
+  .style('opacity',0).transition().duration(1200).delay(700).style('opacity',1);
 
-// Nodes
-const nodeG = root.append('g').selectAll('g').data(nodes).join('g')
-  .attr('transform', d=>`translate(${d.x},${d.y})`);
+// ── LAYERS ──────────────────────────────────────
+const signalG=root.append('g').attr('pointer-events','none');
+const flowEdgeG=root.append('g').attr('pointer-events','none');
+const rippleG=root.append('g').attr('pointer-events','none');
 
-const NODE_R = 17;
+// ═══ NODES ═════════════════════════════════════════
+const nodeG=root.append('g').selectAll('g').data(nodes).join('g')
+  .attr('transform',d=>`translate(${d.x},${d.y})`);
 
-nodeG.each(function(d) {
-  const g = d3.select(this);
-  const col = LAYERS[d.layer].col;
-
-  g.append('circle').attr('r', NODE_R)
-    .attr('fill', col+'18')
-    .attr('stroke', col)
-    .attr('stroke-width', 1.1)
-    .attr('stroke-opacity', 0.55);
-
-  // Inner dot
-  g.append('circle').attr('r', 3.5).attr('fill', col).attr('opacity', 0.8);
-
+nodeG.each(function(d){
+  nodeGMap[d.id]=this;
+  const g=d3.select(this),col=LAYERS[d.layer].col;
+  // Proximity ring
+  g.append('circle').attr('class','prox-ring').attr('r',NODE_R+10)
+    .attr('fill','none').attr('stroke',col).attr('stroke-width',1.4).attr('stroke-opacity',0)
+    .attr('pointer-events','none');
+  // Ambient pulse ring
+  g.append('circle').attr('class','pulse-ring').attr('r',NODE_R)
+    .attr('fill','none').attr('stroke',col).attr('stroke-width',.9).attr('stroke-opacity',0)
+    .attr('pointer-events','none');
+  // Main body
+  g.append('circle').attr('class','node-body').attr('r',NODE_R)
+    .attr('fill',col+'1c').attr('stroke',col).attr('stroke-opacity',.52).attr('stroke-width',1.2);
+  // Inner nucleus
+  g.append('circle').attr('class','nucleus').attr('r',4.5).attr('fill',col).attr('opacity',.85);
   // Label
-  const hub = {x: CX, y: LAYER_Y[d.layer]};
-  const dx = d.x - hub.x, dy = -1;
-  const anchor = Math.abs(d.x - CX) < 40 ? 'middle' : (d.x > CX ? 'start' : 'end');
-  const lx = anchor === 'middle' ? 0 : (anchor === 'start' ? NODE_R+6 : -(NODE_R+6));
-
-  g.append('text')
-    .attr('x', lx).attr('y', NODE_R+13)
-    .attr('text-anchor', anchor)
-    .attr('font-family','JetBrains Mono, monospace')
-    .attr('font-size','8.5px')
-    .attr('fill', col).attr('opacity', 0.72)
-    .text(d.short);
-
+  const angle=Math.atan2(d.y-H/2,d.x-CX);
+  const lx=Math.cos(angle)*(NODE_R+8),ly=Math.sin(angle)*(NODE_R+8);
+  const anchor=Math.abs(d.x-CX)<55?'middle':(d.x>CX?'start':'end');
+  g.append('text').attr('class','node-label')
+    .attr('x',lx).attr('y',ly+3).attr('text-anchor',anchor)
+    .attr('font-family','JetBrains Mono,monospace').attr('font-size','8.5px')
+    .attr('fill',col).attr('opacity',.72).text(d.short);
+  // Interactions
   g.style('cursor','pointer')
-    .on('mouseenter', function(e, nd) {
-      d3.select(this).select('circle')
-        .attr('stroke-opacity', 1).attr('r', NODE_R+2.5)
-        .attr('filter', `url(#gl-${nd.layer})`);
-      showTT(e, nd);
-    })
-    .on('mousemove', moveTT)
-    .on('mouseleave', function(e, nd) {
-      d3.select(this).select('circle')
-        .attr('stroke-opacity', 0.55).attr('r', NODE_R).attr('filter', null);
-      hideTT();
-    })
-    .on('click', (e,nd) => { if(nd.url) window.open(nd.url,'_blank'); });
+    .on('mouseenter',function(e,nd){onNodeEnter(e,nd,g);showTT(e,nd);})
+    .on('mousemove',moveTT)
+    .on('mouseleave',function(e,nd){onNodeLeave(nd,g);hideTT();})
+    .on('click',(e,nd)=>{onNodeClick(nd);if(nd.url)window.open(nd.url,'_blank');});
+});
+nodeG.style('opacity',0).transition().duration(800).delay((d,i)=>400+i*20).style('opacity',1);
+
+// ── Ambient pulse per node (staggered) ───────────
+nodes.forEach((d,i)=>{
+  const ms=LAYERS[d.layer].pulseMs;
+  const g=d3.select(nodeGMap[d.id]),ring=g.select('.pulse-ring');
+  function pulse(){
+    ring.attr('r',NODE_R).attr('stroke-opacity',.55)
+      .transition().duration(ms*.72).ease(d3.easeSinOut)
+      .attr('r',NODE_R+30).attr('stroke-opacity',0)
+      .on('end',()=>setTimeout(pulse,ms*.28+Math.random()*350));
+  }
+  setTimeout(pulse,i*(ms/nodes.length));
 });
 
-nodeG.style('opacity',0)
-  .transition().duration(700).delay((d,i)=>400+i*22)
-  .style('opacity',1);
-
-// ── TOOLTIP ────────────────────────────────────────────────────────────────
-const tt = document.getElementById('tt');
-function showTT(e,d) {
-  const col = LAYERS[d.layer].col;
-  document.getElementById('tt-layer').style.color = col;
-  document.getElementById('tt-layer').textContent = LAYERS[d.layer].label;
-  document.getElementById('tt-name').textContent = d.label;
-  document.getElementById('tt-eq').textContent = d.eq || '';
-  document.getElementById('tt-eq').style.color = col;
-  document.getElementById('tt-desc').textContent = d.desc || '';
-  const lnk = document.getElementById('tt-link');
-  lnk.href = d.url; lnk.style.color = col;
-  moveTT(e); tt.style.opacity='1';
+// ═══ SIGNAL PARTICLE ENGINE ═══════════════════════
+function spawnSignal(src,tgt,col,delay=0,op=0.88){
+  setTimeout(()=>{
+    const p=signalG.append('circle').attr('cx',src.x).attr('cy',src.y)
+      .attr('r',2.8).attr('fill',col).attr('opacity',0);
+    p.transition().duration(80).attr('opacity',op)
+      .transition().duration(480).ease(d3.easeLinear)
+      .attr('cx',tgt.x).attr('cy',tgt.y)
+      .transition().duration(80).attr('opacity',0)
+      .on('end',()=>p.remove());
+  },delay);
 }
-function moveTT(e) {
-  let x=e.clientX+18, y=e.clientY-8;
-  if(x+290>innerWidth) x=e.clientX-290-10;
-  if(y+200>innerHeight) y=e.clientY-200;
-  tt.style.left=x+'px'; tt.style.top=y+'px';
-}
-function hideTT() { tt.style.opacity='0'; }
 
-// ── INTRO ──────────────────────────────────────────────────────────────────
-setTimeout(() => {
-  const intro = document.getElementById('intro');
+// ═══ AMBIENT NEURAL FIRING ════════════════════════
+let activeNode=null;
+function ambientFire(){
+  if(activeNode) return;
+  const eligible=nodes.filter(n=>n.layer!=='l5');
+  const src=eligible[Math.floor(Math.random()*eligible.length)];
+  const col=LAYERS[src.layer].col;
+  const lIdx=LAYER_ORDER.indexOf(src.layer);
+  const nextKey=LAYER_ORDER[lIdx+1];
+  if(!nextKey) return;
+  const targets=nodes.filter(n=>n.layer===nextKey);
+  // Flash nucleus
+  d3.select(nodeGMap[src.id]).select('.nucleus')
+    .transition().duration(120).attr('r',7).attr('opacity',1)
+    .transition().duration(320).attr('r',4.5).attr('opacity',.85);
+  // Signals to nearest 2-3 nodes in next layer
+  [...targets].sort(()=>Math.random()-.5).slice(0,Math.min(3,targets.length))
+    .forEach((t,i)=>spawnSignal(src,t,col,i*75,0.55));
+}
+setInterval(ambientFire,2300+Math.random()*400);
+
+// ═══ HOVER EFFECTS ════════════════════════════════
+function onNodeEnter(e,nd,g){
+  activeNode=nd.id;
+  const col=LAYERS[nd.layer].col;
+  const lIdx=LAYER_ORDER.indexOf(nd.layer);
+
+  // Scale group
+  g.transition().duration(155).ease(d3.easeBackOut.overshoot(1.4))
+    .attr('transform',`translate(${nd.x},${nd.y}) scale(1.44)`);
+  g.select('.node-body').attr('stroke-opacity',1).attr('fill',col+'33').attr('filter',`url(#gl-${nd.layer})`);
+  g.select('.nucleus').attr('r',6).attr('opacity',1);
+  g.select('.prox-ring').attr('stroke-opacity',.7).attr('r',NODE_R+11);
+
+  // Animated flow edges
+  flowEdgeG.selectAll('*').remove();
+  const nextKey=LAYER_ORDER[lIdx+1],prevKey=LAYER_ORDER[lIdx-1];
+  if(nextKey){
+    nodes.filter(n=>n.layer===nextKey).forEach((t,i)=>{
+      flowEdgeG.append('line')
+        .attr('x1',nd.x).attr('y1',nd.y).attr('x2',t.x).attr('y2',t.y)
+        .attr('stroke',col).attr('stroke-width',1.8).attr('stroke-opacity',.7)
+        .attr('stroke-dasharray','7,5')
+        .style('animation','signal-flow .55s linear infinite');
+      spawnSignal(nd,t,col,i*52);
+    });
+  }
+  // Backward gradient signals (delayed, dimmer)
+  if(prevKey){
+    setTimeout(()=>{
+      nodes.filter(n=>n.layer===prevKey).slice(0,4)
+        .forEach((t,i)=>spawnSignal(nd,t,col+'77',i*42,0.42));
+    },400);
+  }
+
+  // Dim other layers
+  nodeG.each(function(dd){
+    if(dd.layer!==nd.layer)
+      d3.select(this).transition().duration(200).style('opacity',.12);
+  });
+  document.querySelectorAll('.li').forEach(el=>{
+    el.style.opacity=el.dataset.layer===nd.layer?'1':'0.2';
+  });
+}
+
+function onNodeLeave(nd,g){
+  activeNode=null;
+  const col=LAYERS[nd.layer].col;
+  g.transition().duration(200).ease(d3.easeCubicOut)
+    .attr('transform',`translate(${nd.x},${nd.y}) scale(1)`);
+  g.select('.node-body').attr('stroke-opacity',.52).attr('fill',col+'1c').attr('filter',null);
+  g.select('.nucleus').attr('r',4.5).attr('opacity',.85);
+  g.select('.prox-ring').attr('stroke-opacity',0);
+  flowEdgeG.selectAll('*').remove();
+  nodeG.each(function(){d3.select(this).transition().duration(280).style('opacity',1);});
+  document.querySelectorAll('.li').forEach(el=>el.style.opacity='1');
+}
+
+// Click: full forward pass cascade
+function onNodeClick(nd){
+  const col=LAYERS[nd.layer].col;
+  const lIdx=LAYER_ORDER.indexOf(nd.layer);
+  // Ripple
+  [1,2,3].forEach(k=>setTimeout(()=>{
+    const r=rippleG.append('circle').attr('cx',nd.x).attr('cy',nd.y)
+      .attr('r',NODE_R+2).attr('fill','none').attr('stroke',col)
+      .attr('stroke-width',2.4-k*.5).attr('stroke-opacity',.85);
+    r.transition().duration(680).ease(d3.easeCubicOut)
+      .attr('r',NODE_R+58+k*14).attr('stroke-opacity',0).on('end',()=>r.remove());
+  },k*95));
+  // Forward pass through all subsequent layers
+  let delay=0;
+  for(let i=lIdx;i<LAYER_ORDER.length-1;i++){
+    const srcs=i===lIdx?[nd]:nodes.filter(n=>n.layer===LAYER_ORDER[i]);
+    const tgts=nodes.filter(n=>n.layer===LAYER_ORDER[i+1]);
+    const d=delay;
+    srcs.forEach(src=>tgts.forEach((t,j)=>spawnSignal(src,t,col,d+j*28,0.82)));
+    delay+=360;
+  }
+}
+
+// ═══ PROXIMITY GLOW ════════════════════════════════
+let mouseRX=CX,mouseRY=H/2;
+svg.on('mousemove.prox',function(e){
+  const tr=d3.zoomTransform(svg.node());
+  mouseRX=(e.clientX-tr.x)/tr.k; mouseRY=(e.clientY-tr.y)/tr.k;
+  aurora.attr('cx',mouseRX).attr('cy',mouseRY).attr('opacity',1);
+});
+svg.on('mouseleave.prox',()=>aurora.attr('opacity',0));
+
+function proxLoop(){
+  if(!activeNode){
+    const tr=d3.zoomTransform(svg.node()),PROX=215/tr.k;
+    nodeG.each(function(d){
+      const dx=d.x-mouseRX,dy=d.y-mouseRY,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<PROX){
+        const t=Math.pow(1-dist/PROX,2.4);
+        d3.select(this).select('.node-body')
+          .attr('stroke-opacity',.52+t*.48).attr('r',NODE_R+t*2.8)
+          .attr('filter',t>.42?`url(#gl-${d.layer})`:null);
+        d3.select(this).select('.prox-ring').attr('stroke-opacity',t*.5).attr('r',NODE_R+10+t*5);
+        d3.select(this).select('.nucleus').attr('r',4.5+t*1.8);
+      }else{
+        d3.select(this).select('.node-body').attr('stroke-opacity',.52).attr('r',NODE_R).attr('filter',null);
+        d3.select(this).select('.prox-ring').attr('stroke-opacity',0);
+        d3.select(this).select('.nucleus').attr('r',4.5);
+      }
+    });
+  }
+  requestAnimationFrame(proxLoop);
+}
+
+// ═══ 3-D PARALLAX TILT ═════════════════════════════
+let tRx=0,tRy=0,cRx=0,cRy=0;
+const graphInner=document.getElementById('graph-inner');
+document.addEventListener('mousemove',e=>{
+  tRx=(e.clientY/H-.5)*4.5; tRy=(e.clientX/W-.5)*-4.5;
+});
+document.addEventListener('mouseleave',()=>{tRx=0;tRy=0;});
+function tiltLoop(){
+  cRx+=(tRx-cRx)*.05; cRy+=(tRy-cRy)*.05;
+  if(Math.abs(cRx)>.003||Math.abs(cRy)>.003)
+    graphInner.style.transform=`rotateX(${cRx.toFixed(3)}deg) rotateY(${cRy.toFixed(3)}deg)`;
+  requestAnimationFrame(tiltLoop);
+}
+
+// ═══ TOOLTIP ═══════════════════════════════════════
+const tt=document.getElementById('tt');
+function showTT(e,d){
+  const col=LAYERS[d.layer].col;
+  document.getElementById('tt-layer').style.color=col;
+  document.getElementById('tt-layer').textContent=LAYERS[d.layer].label;
+  document.getElementById('tt-name').textContent=d.label;
+  document.getElementById('tt-eq').textContent=d.eq||'';
+  document.getElementById('tt-eq').style.color=col;
+  document.getElementById('tt-desc').textContent=d.desc||'';
+  const lnk=document.getElementById('tt-link');lnk.href=d.url||'#';lnk.style.color=col;
+  moveTT(e);tt.style.opacity='1';
+}
+function moveTT(e){
+  let x=e.clientX+18,y=e.clientY-8;
+  if(x+302>innerWidth)x=e.clientX-302-10;
+  if(y+215>innerHeight)y=e.clientY-215;
+  tt.style.left=x+'px';tt.style.top=y+'px';
+}
+function hideTT(){tt.style.opacity='0';}
+
+// ═══ BOOT ══════════════════════════════════════════
+setTimeout(()=>{
+  proxLoop();tiltLoop();
+  const intro=document.getElementById('intro');
   intro.style.opacity='0';
-  setTimeout(()=>intro.remove(), 950);
-}, 800);
+  setTimeout(()=>intro.remove(),950);
+},750);
 </script>
 </body>
 </html>
