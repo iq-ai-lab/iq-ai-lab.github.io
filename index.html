@@ -128,52 +128,52 @@ const LAYERS={
 const LAYER_ORDER=['l0','l1','l2','l3','l4','l5'];
 
 const REPOS=[
-  {id:'la', layer:'l0',short:'Linear Algebra',   label:'Linear Algebra Deep Dive',        eq:'Aᵀ=UΣVᵀ  ·  det(A)  ·  λv=Av',       url:`${BASE}/linear-algebra-deep-dive`,              desc:'벡터공간, 고유값 분해, SVD, PCA 증명, 텐서'},
-  {id:'pt', layer:'l0',short:'Prob Theory',       label:'Probability Theory Deep Dive',    eq:'P(A∩B)=P(A|B)P(B)  ·  E[X|Y]',        url:`${BASE}/probability-theory-deep-dive`,          desc:'측도 기반 확률론, 마팅게일, 수렴 4종'},
-  {id:'ms', layer:'l0',short:'Math Stats',        label:'Mathematical Statistics',         eq:'θ̂_MLE = argmax ℓ(θ)',                  url:`${BASE}/mathematical-statistics-deep-dive`,    desc:'MLE/MAP 유도, 가설검정, 점근이론'},
-  {id:'co', layer:'l0',short:'Calculus & Opt',    label:'Calculus & Optimization',         eq:'∇f=0  ·  ∂²f/∂xᵢ∂xⱼ  ·  H≻0',       url:`${BASE}/calculus-optimization-deep-dive`,       desc:'편미분, 야코비안, 헤시안, 라그랑주'},
-  {id:'cx', layer:'l0',short:'Convex Opt',        label:'Convex Optimization Deep Dive',   eq:'KKT: ∇f+μᵀ∇g=0  ·  dual gap',        url:`${BASE}/convex-optimization-deep-dive`,         desc:'볼록 집합/함수, KKT 조건, 쌍대이론'},
-  {id:'it', layer:'l0',short:'Info Theory',       label:'Information Theory Deep Dive',    eq:'H(X)=−∑p log p  ·  I(X;Y)',           url:`${BASE}/information-theory-deep-dive`,          desc:'Shannon Entropy, KL-Divergence, 상호정보량'},
-  {id:'sp', layer:'l0',short:'Stoch Processes',   label:'Stochastic Processes',            eq:'P(Xₙ₊₁|X₀..Xₙ)=P(Xₙ₊₁|Xₙ)',          url:`${BASE}/stochastic-processes-deep-dive`,        desc:'마르코프 체인, 브라운 운동, MCMC'},
-  {id:'sde',layer:'l0',short:'SDE',               label:'Stochastic Diff. Equations',      eq:'dX=μdt+σdW  ·  Itô lemma',            url:`${BASE}/sde-deep-dive`,                         desc:'이토 적분, SDE, Fokker-Planck 방정식'},
-  {id:'fa', layer:'l0',short:'Functional Analysis',label:'Functional Analysis',            eq:'‖f‖²=⟨f,f⟩  ·  T:H→H  ·  RKHS',      url:`${BASE}/functional-analysis-deep-dive`,         desc:'힐베르트 공간, 스펙트럴 이론, RKHS'},
-  {id:'ig', layer:'l0',short:'Info Geometry',     label:'Information Geometry',            eq:'Fᵢⱼ=E[∂ᵢlog p · ∂ⱼlog p]',            url:`${BASE}/information-geometry-deep-dive`,        desc:'통계다양체, Fisher 정보 행렬, Natural Gradient'},
-  {id:'mf', layer:'l1',short:'ML Fundamentals',   label:'ML Fundamentals Deep Dive',       eq:'β=(XᵀX)⁻¹Xᵀy  ·  bias-var decomp',   url:`${BASE}/ml-fundamentals-deep-dive`,             desc:'선형회귀 Normal Eq 유도, SVM, 앙상블 수렴'},
-  {id:'sl', layer:'l1',short:'Stat Learning',     label:'Statistical Learning Theory',     eq:'PAC: P(err≤ε)≥1−δ  ·  VC dim',       url:`${BASE}/statistical-learning-theory-deep-dive`,desc:'PAC Learning, VC 차원, Rademacher 복잡도'},
-  {id:'km', layer:'l1',short:'Kernel Methods',    label:'Kernel Methods Deep Dive',        eq:'K(x,x\')=⟨φ(x),φ(x\')⟩  ·  Mercer',  url:`${BASE}/kernel-methods-deep-dive`,              desc:'Mercer 정리, RKHS, SVM 쌍대 유도, GP'},
-  {id:'bm', layer:'l1',short:'Bayesian ML',       label:'Bayesian ML Deep Dive',           eq:'P(θ|D)∝P(D|θ)P(θ)  ·  ELBO',          url:`${BASE}/bayesian-ml-deep-dive`,                 desc:'베이지안 추론, 변분 베이즈, ELBO 유도, MCMC'},
-  {id:'gmo',layer:'l1',short:'Graphical Models',  label:'Graphical Models Deep Dive',      eq:'P(X)=∏ψc(Xc)/Z  ·  BP algo',         url:`${BASE}/graphical-models-deep-dive`,            desc:'베이지안 네트워크, 마르코프 필드, 믿음 전파'},
-  {id:'nn', layer:'l2',short:'NN Theory',         label:'Neural Network Theory',           eq:'δˡ=(Wˡ⁺¹)ᵀδˡ⁺¹⊙σ\'(zˡ)  ·  UAT',    url:`${BASE}/neural-network-theory-deep-dive`,       desc:'범용 근사 정리 증명, 역전파 완전 유도'},
-  {id:'ot', layer:'l2',short:'Optimization',      label:'Optimization Theory Deep Dive',   eq:'θₜ₊₁=θₜ−αₜ∇L  ·  Adam mₜ/√vₜ',      url:`${BASE}/optimization-theory-deep-dive`,         desc:'SGD 수렴 분석, Adam 수렴 반례, LR Scheduler'},
-  {id:'gen',layer:'l2',short:'Generalization',    label:'Generalization Theory',           eq:'NTK: f_θ≈f₀+Θ(x,·)α  ·  DD',        url:`${BASE}/generalization-theory-deep-dive`,       desc:'Double Descent, NTK, Grokking, Lottery Ticket'},
-  {id:'reg',layer:'l2',short:'Regularization',    label:'Regularization Theory',           eq:'L̃=L+λ‖w‖²  ·  E[Dropout]=p·f',       url:`${BASE}/regularization-theory-deep-dive`,       desc:'L1/L2 베이즈 해석, Dropout 앙상블, BatchNorm 증명'},
-  {id:'cn', layer:'l3',short:'CNN',               label:'CNN Deep Dive',                   eq:'(f★g)[n]=∑f[m]g[n−m]  ·  equivar',   url:`${BASE}/cnn-deep-dive`,                         desc:'Convolution 등변성, Receptive Field, ResNet 항등'},
-  {id:'rnn',layer:'l3',short:'RNN & LSTM',        label:'RNN & LSTM Deep Dive',            eq:'hₜ=tanh(Wxₜ+Uhₜ₋₁+b)  ·  BPTT',      url:`${BASE}/rnn-lstm-deep-dive`,                    desc:'BPTT 완전 유도, Vanishing Gradient 스펙트럴'},
-  {id:'tr', layer:'l3',short:'Transformer',       label:'Transformer Deep Dive',           eq:'Attn=softmax(QKᵀ/√d)V  ·  MHA',      url:`${BASE}/transformer-deep-dive`,                 desc:'Attention 수식 완전 분해, √d 근거, Linear Attn'},
-  {id:'gnn',layer:'l3',short:'GNN',               label:'Graph Neural Network',            eq:'h^(l+1)=σ(D̃⁻¹ÃH^(l)W^(l))  ·  WL',  url:`${BASE}/gnn-deep-dive`,                         desc:'그래프 라플라시안 유도, Message Passing, WL 검사'},
-  {id:'gv', layer:'l3',short:'Generative Models', label:'Generative Model Deep Dive',      eq:'ELBO=Eq[log p]−KL(q‖p)  ·  GAN',     url:`${BASE}/generative-model-deep-dive`,            desc:'GAN minimax 수렴, VAE ELBO 완전 유도, NF'},
-  {id:'rf', layer:'l4',short:'RL Foundations',    label:'RL Foundations Deep Dive',        eq:'V*(s)=maxₐ[r+γΣV*(s\')]  ·  MDP',     url:`${BASE}/rl-foundations-deep-dive`,              desc:'MDP 공리적 정의, 벨만 방정식 완전 유도'},
-  {id:'mfr',layer:'l4',short:'Model-Free RL',     label:'Model-Free RL Deep Dive',         eq:'Q←Q+α[r+γmaxQ\'−Q]  ·  TD(λ)',       url:`${BASE}/model-free-rl-deep-dive`,               desc:'Q-Learning 수렴 증명 (Robbins-Monro 조건)'},
-  {id:'dr', layer:'l4',short:'Deep RL',           label:'Deep RL Deep Dive',               eq:'L=(r+γmaxQ\'−Q(s,a;θ))²  ·  DQN',    url:`${BASE}/deep-rl-deep-dive`,                     desc:'DQN 경험 재생 이론, Double DQN 과대추정 증명'},
-  {id:'pg', layer:'l4',short:'Policy Gradient',   label:'Policy Gradient Deep Dive',       eq:'∇J=Eτ[∇log π(a|s)·A(s,a)]  ·  GAE',  url:`${BASE}/policy-gradient-deep-dive`,             desc:'REINFORCE 완전 유도, 정책 기울기 정리, GAE'},
-  {id:'ar', layer:'l4',short:'Advanced RL',       label:'Advanced RL Deep Dive',           eq:'PPO: clip(rₜ,1±ε)Aₜ  ·  SAC H',      url:`${BASE}/advanced-rl-deep-dive`,                 desc:'TRPO 단조 개선 이론, PPO 클리핑 근거, SAC'},
-  {id:'lp', layer:'l4',short:'LLM Pretraining',   label:'LLM Pretraining Deep Dive',       eq:'L∝N^0.34·D^0.28  (Chinchilla law)',   url:`${BASE}/llm-pretraining-deep-dive`,             desc:'Scaling Law 수식, 학습 안정성, 데이터 혼합 이론'},
-  {id:'la2',layer:'l4',short:'LLM Alignment',     label:'LLM Alignment Deep Dive',         eq:'DPO: log σ(β log π*/πref)  ·  RLHF',  url:`${BASE}/llm-alignment-deep-dive`,               desc:'RLHF 보상 모델링, DPO Bradley-Terry 유도'},
-  {id:'df', layer:'l4',short:'Diffusion Models',  label:'Diffusion Model Deep Dive',       eq:'p(xₜ₋₁|xₜ)=N(μθ,Σθ)  ·  DDIM',     url:`${BASE}/diffusion-model-deep-dive`,             desc:'DDPM Forward/Reverse 완전 유도, Score Matching'},
-  {id:'pi', layer:'l5',short:'PyTorch Internals', label:'PyTorch Internals Deep Dive',     eq:'∂L/∂x=Jᵀ·v  ·  VJP  ·  CUDA kernel', url:`${BASE}/pytorch-internals-deep-dive`,           desc:'Autograd 야코비안 벡터곱, CUDA 커널, 혼합 정밀도'},
-  {id:'ef', layer:'l5',short:'Efficient ML',      label:'Efficient ML Deep Dive',          eq:'FlashAttn: O(N)mem  ·  LoRA: ΔW=BA',  url:`${BASE}/efficient-ml-deep-dive`,                desc:'Pruning/Quantization/Distillation 수학, vLLM'},
+  {id:'la', sym:'λ',  layer:'l0',short:'Linear Algebra',   label:'Linear Algebra Deep Dive',        eq:'Aᵀ=UΣVᵀ  ·  det(A)  ·  λv=Av',       url:`${BASE}/linear-algebra-deep-dive`,              desc:'벡터공간, 고유값 분해, SVD, PCA 증명, 텐서'},
+  {id:'pt', sym:'P',  layer:'l0',short:'Prob Theory',       label:'Probability Theory Deep Dive',    eq:'P(A∩B)=P(A|B)P(B)  ·  E[X|Y]',        url:`${BASE}/probability-theory-deep-dive`,          desc:'측도 기반 확률론, 마팅게일, 수렴 4종'},
+  {id:'ms', sym:'θ̂',  layer:'l0',short:'Math Stats',        label:'Mathematical Statistics',         eq:'θ̂_MLE = argmax ℓ(θ)',                  url:`${BASE}/mathematical-statistics-deep-dive`,    desc:'MLE/MAP 유도, 가설검정, 점근이론'},
+  {id:'co', sym:'∇',  layer:'l0',short:'Calculus & Opt',    label:'Calculus & Optimization',         eq:'∇f=0  ·  ∂²f/∂xᵢ∂xⱼ  ·  H≻0',       url:`${BASE}/calculus-optimization-deep-dive`,       desc:'편미분, 야코비안, 헤시안, 라그랑주'},
+  {id:'cx', sym:'∂',  layer:'l0',short:'Convex Opt',        label:'Convex Optimization Deep Dive',   eq:'KKT: ∇f+μᵀ∇g=0  ·  dual gap',        url:`${BASE}/convex-optimization-deep-dive`,         desc:'볼록 집합/함수, KKT 조건, 쌍대이론'},
+  {id:'it', sym:'H',  layer:'l0',short:'Info Theory',       label:'Information Theory Deep Dive',    eq:'H(X)=−∑p log p  ·  I(X;Y)',           url:`${BASE}/information-theory-deep-dive`,          desc:'Shannon Entropy, KL-Divergence, 상호정보량'},
+  {id:'sp', sym:'ω',  layer:'l0',short:'Stoch Processes',   label:'Stochastic Processes',            eq:'P(Xₙ₊₁|X₀..Xₙ)=P(Xₙ₊₁|Xₙ)',          url:`${BASE}/stochastic-processes-deep-dive`,        desc:'마르코프 체인, 브라운 운동, MCMC'},
+  {id:'sde',sym:'dX', layer:'l0',short:'SDE',               label:'Stochastic Diff. Equations',      eq:'dX=μdt+σdW  ·  Itô lemma',            url:`${BASE}/sde-deep-dive`,                         desc:'이토 적분, SDE, Fokker-Planck 방정식'},
+  {id:'fa', sym:'⟨⟩', layer:'l0',short:'Functional Analysis',label:'Functional Analysis',            eq:'‖f‖²=⟨f,f⟩  ·  T:H→H  ·  RKHS',      url:`${BASE}/functional-analysis-deep-dive`,         desc:'힐베르트 공간, 스펙트럴 이론, RKHS'},
+  {id:'ig', sym:'F',  layer:'l0',short:'Info Geometry',     label:'Information Geometry',            eq:'Fᵢⱼ=E[∂ᵢlog p · ∂ⱼlog p]',            url:`${BASE}/information-geometry-deep-dive`,        desc:'통계다양체, Fisher 정보 행렬, Natural Gradient'},
+  {id:'mf', sym:'β',  layer:'l1',short:'ML Fundamentals',   label:'ML Fundamentals Deep Dive',       eq:'β=(XᵀX)⁻¹Xᵀy  ·  bias-var decomp',   url:`${BASE}/ml-fundamentals-deep-dive`,             desc:'선형회귀 Normal Eq 유도, SVM, 앙상블 수렴'},
+  {id:'sl', sym:'ε',  layer:'l1',short:'Stat Learning',     label:'Statistical Learning Theory',     eq:'PAC: P(err≤ε)≥1−δ  ·  VC dim',       url:`${BASE}/statistical-learning-theory-deep-dive`,desc:'PAC Learning, VC 차원, Rademacher 복잡도'},
+  {id:'km', sym:'K',  layer:'l1',short:'Kernel Methods',    label:'Kernel Methods Deep Dive',        eq:'K(x,x\')=⟨φ(x),φ(x\')⟩  ·  Mercer',  url:`${BASE}/kernel-methods-deep-dive`,              desc:'Mercer 정리, RKHS, SVM 쌍대 유도, GP'},
+  {id:'bm', sym:'∝',  layer:'l1',short:'Bayesian ML',       label:'Bayesian ML Deep Dive',           eq:'P(θ|D)∝P(D|θ)P(θ)  ·  ELBO',          url:`${BASE}/bayesian-ml-deep-dive`,                 desc:'베이지안 추론, 변분 베이즈, ELBO 유도, MCMC'},
+  {id:'gmo',sym:'G',  layer:'l1',short:'Graphical Models',  label:'Graphical Models Deep Dive',      eq:'P(X)=∏ψc(Xc)/Z  ·  BP algo',         url:`${BASE}/graphical-models-deep-dive`,            desc:'베이지안 네트워크, 마르코프 필드, 믿음 전파'},
+  {id:'nn', sym:'δ',  layer:'l2',short:'NN Theory',         label:'Neural Network Theory',           eq:'δˡ=(Wˡ⁺¹)ᵀδˡ⁺¹⊙σ\'(zˡ)  ·  UAT',    url:`${BASE}/neural-network-theory-deep-dive`,       desc:'범용 근사 정리 증명, 역전파 완전 유도'},
+  {id:'ot', sym:'α',  layer:'l2',short:'Optimization',      label:'Optimization Theory Deep Dive',   eq:'θₜ₊₁=θₜ−αₜ∇L  ·  Adam mₜ/√vₜ',      url:`${BASE}/optimization-theory-deep-dive`,         desc:'SGD 수렴 분석, Adam 수렴 반례, LR Scheduler'},
+  {id:'gen',sym:'R',  layer:'l2',short:'Generalization',    label:'Generalization Theory',           eq:'NTK: f_θ≈f₀+Θ(x,·)α  ·  DD',        url:`${BASE}/generalization-theory-deep-dive`,       desc:'Double Descent, NTK, Grokking, Lottery Ticket'},
+  {id:'reg',sym:'λ',  layer:'l2',short:'Regularization',    label:'Regularization Theory',           eq:'L̃=L+λ‖w‖²  ·  E[Dropout]=p·f',       url:`${BASE}/regularization-theory-deep-dive`,       desc:'L1/L2 베이즈 해석, Dropout 앙상블, BatchNorm 증명'},
+  {id:'cn', sym:'★',  layer:'l3',short:'CNN',               label:'CNN Deep Dive',                   eq:'(f★g)[n]=∑f[m]g[n−m]  ·  equivar',   url:`${BASE}/cnn-deep-dive`,                         desc:'Convolution 등변성, Receptive Field, ResNet 항등'},
+  {id:'rnn',sym:'h',  layer:'l3',short:'RNN & LSTM',        label:'RNN & LSTM Deep Dive',            eq:'hₜ=tanh(Wxₜ+Uhₜ₋₁+b)  ·  BPTT',      url:`${BASE}/rnn-lstm-deep-dive`,                    desc:'BPTT 완전 유도, Vanishing Gradient 스펙트럴'},
+  {id:'tr', sym:'Q',  layer:'l3',short:'Transformer',       label:'Transformer Deep Dive',           eq:'Attn=softmax(QKᵀ/√d)V  ·  MHA',      url:`${BASE}/transformer-deep-dive`,                 desc:'Attention 수식 완전 분해, √d 근거, Linear Attn'},
+  {id:'gnn',sym:'Ã',  layer:'l3',short:'GNN',               label:'Graph Neural Network',            eq:'h^(l+1)=σ(D̃⁻¹ÃH^(l)W^(l))  ·  WL',  url:`${BASE}/gnn-deep-dive`,                         desc:'그래프 라플라시안 유도, Message Passing, WL 검사'},
+  {id:'gv', sym:'z',  layer:'l3',short:'Generative Models', label:'Generative Model Deep Dive',      eq:'ELBO=Eq[log p]−KL(q‖p)  ·  GAN',     url:`${BASE}/generative-model-deep-dive`,            desc:'GAN minimax 수렴, VAE ELBO 완전 유도, NF'},
+  {id:'rf', sym:'V*', layer:'l4',short:'RL Foundations',    label:'RL Foundations Deep Dive',        eq:'V*(s)=maxₐ[r+γΣV*(s\')]  ·  MDP',     url:`${BASE}/rl-foundations-deep-dive`,              desc:'MDP 공리적 정의, 벨만 방정식 완전 유도'},
+  {id:'mfr',sym:'Q*', layer:'l4',short:'Model-Free RL',     label:'Model-Free RL Deep Dive',         eq:'Q←Q+α[r+γmaxQ\'−Q]  ·  TD(λ)',       url:`${BASE}/model-free-rl-deep-dive`,               desc:'Q-Learning 수렴 증명 (Robbins-Monro 조건)'},
+  {id:'dr', sym:'L',  layer:'l4',short:'Deep RL',           label:'Deep RL Deep Dive',               eq:'L=(r+γmaxQ\'−Q(s,a;θ))²  ·  DQN',    url:`${BASE}/deep-rl-deep-dive`,                     desc:'DQN 경험 재생 이론, Double DQN 과대추정 증명'},
+  {id:'pg', sym:'π',  layer:'l4',short:'Policy Gradient',   label:'Policy Gradient Deep Dive',       eq:'∇J=Eτ[∇log π(a|s)·A(s,a)]  ·  GAE',  url:`${BASE}/policy-gradient-deep-dive`,             desc:'REINFORCE 완전 유도, 정책 기울기 정리, GAE'},
+  {id:'ar', sym:'J',  layer:'l4',short:'Advanced RL',       label:'Advanced RL Deep Dive',           eq:'PPO: clip(rₜ,1±ε)Aₜ  ·  SAC H',      url:`${BASE}/advanced-rl-deep-dive`,                 desc:'TRPO 단조 개선 이론, PPO 클리핑 근거, SAC'},
+  {id:'lp', sym:'N',  layer:'l4',short:'LLM Pretraining',   label:'LLM Pretraining Deep Dive',       eq:'L∝N^0.34·D^0.28  (Chinchilla law)',   url:`${BASE}/llm-pretraining-deep-dive`,             desc:'Scaling Law 수식, 학습 안정성, 데이터 혼합 이론'},
+  {id:'la2',sym:'β',  layer:'l4',short:'LLM Alignment',     label:'LLM Alignment Deep Dive',         eq:'DPO: log σ(β log π*/πref)  ·  RLHF',  url:`${BASE}/llm-alignment-deep-dive`,               desc:'RLHF 보상 모델링, DPO Bradley-Terry 유도'},
+  {id:'df', sym:'p',  layer:'l4',short:'Diffusion Models',  label:'Diffusion Model Deep Dive',       eq:'p(xₜ₋₁|xₜ)=N(μθ,Σθ)  ·  DDIM',     url:`${BASE}/diffusion-model-deep-dive`,             desc:'DDPM Forward/Reverse 완전 유도, Score Matching'},
+  {id:'pi', sym:'∂L', layer:'l5',short:'PyTorch Internals', label:'PyTorch Internals Deep Dive',     eq:'∂L/∂x=Jᵀ·v  ·  VJP  ·  CUDA kernel', url:`${BASE}/pytorch-internals-deep-dive`,           desc:'Autograd 야코비안 벡터곱, CUDA 커널, 혼합 정밀도'},
+  {id:'ef', sym:'ΔW', layer:'l5',short:'Efficient ML',      label:'Efficient ML Deep Dive',          eq:'FlashAttn: O(N)mem  ·  LoRA: ΔW=BA',  url:`${BASE}/efficient-ml-deep-dive`,                desc:'Pruning/Quantization/Distillation 수학, vLLM'},
 ];
 
 // ═══ LAYOUT ════════════════════════════════════════
 const W=innerWidth,H=innerHeight,CX=W/2;
-const NODE_R=18;
+const NODE_R=15;
 const LAYER_CONFIG={
   l5:{y:H*.10,rows:1},
-  l4:{y:H*.23,rows:2,rowH:H*.086},
-  l3:{y:H*.43,rows:1},
-  l2:{y:H*.55,rows:1},
-  l1:{y:H*.67,rows:1},
-  l0:{y:H*.77,rows:2,rowH:H*.086},
+  l4:{y:H*.23,rows:2,rowH:H*.09},
+  l3:{y:H*.44,rows:1},
+  l2:{y:H*.56,rows:1},
+  l1:{y:H*.68,rows:1},
+  l0:{y:H*.78,rows:2,rowH:H*.09},
 };
 
 function buildGraph(){
@@ -184,10 +184,10 @@ function buildGraph(){
     let x,y;
     if(cfg.rows===2){
       const r0=Math.ceil(total/2),row=i<r0?0:1,idx=row===0?i:i-r0,cnt=row===0?r0:total-r0;
-      const spread=Math.min(W*.83,cnt*148);
+      const spread=Math.min(W*.88,cnt*210);
       x=CX-spread/2+(spread/(cnt-1||1))*idx; y=cfg.y+row*cfg.rowH;
     }else{
-      const spread=Math.min(W*.83,total*148);
+      const spread=Math.min(W*.88,total*210);
       x=CX-spread/2+(spread/(total-1||1))*i; y=cfg.y;
     }
     const node={...r,type:'repo',x,y};
@@ -280,8 +280,14 @@ nodeG.each(function(d){
   // Main body
   g.append('circle').attr('class','node-body').attr('r',NODE_R)
     .attr('fill',col+'1c').attr('stroke',col).attr('stroke-opacity',.52).attr('stroke-width',1.2);
-  // Inner nucleus
-  g.append('circle').attr('class','nucleus').attr('r',4.5).attr('fill',col).attr('opacity',.85);
+  // Math symbol (replaces nucleus dot)
+  const symLen=(d.sym||'').length;
+  const symSize=symLen<=1?11:symLen<=2?9:7.5;
+  g.append('text').attr('class','node-sym')
+    .attr('text-anchor','middle').attr('dominant-baseline','central')
+    .attr('font-family','JetBrains Mono,monospace').attr('font-size',`${symSize}px`)
+    .attr('font-weight','500').attr('fill',col).attr('opacity',.92)
+    .attr('pointer-events','none').text(d.sym||'·');
   // Label
   const angle=Math.atan2(d.y-H/2,d.x-CX);
   const lx=Math.cos(angle)*(NODE_R+8),ly=Math.sin(angle)*(NODE_R+8);
@@ -304,9 +310,9 @@ nodes.forEach((d,i)=>{
   const ms=LAYERS[d.layer].pulseMs;
   const g=d3.select(nodeGMap[d.id]),ring=g.select('.pulse-ring');
   function pulse(){
-    ring.attr('r',NODE_R).attr('stroke-opacity',.55)
+    ring.attr('r',NODE_R).attr('stroke-opacity',.5)
       .transition().duration(ms*.72).ease(d3.easeSinOut)
-      .attr('r',NODE_R+30).attr('stroke-opacity',0)
+      .attr('r',NODE_R+16).attr('stroke-opacity',0)
       .on('end',()=>setTimeout(pulse,ms*.28+Math.random()*350));
   }
   setTimeout(pulse,i*(ms/nodes.length));
@@ -336,10 +342,10 @@ function ambientFire(){
   const nextKey=LAYER_ORDER[lIdx+1];
   if(!nextKey) return;
   const targets=nodes.filter(n=>n.layer===nextKey);
-  // Flash nucleus
-  d3.select(nodeGMap[src.id]).select('.nucleus')
-    .transition().duration(120).attr('r',7).attr('opacity',1)
-    .transition().duration(320).attr('r',4.5).attr('opacity',.85);
+  // Briefly brighten symbol
+  d3.select(nodeGMap[src.id]).select('.node-sym')
+    .transition().duration(120).attr('font-size','14px').attr('opacity',1)
+    .transition().duration(320).attr('font-size', src.sym && src.sym.length<=1?'11px':src.sym && src.sym.length<=2?'9px':'7.5px').attr('opacity',.92);
   // Signals to nearest 2-3 nodes in next layer
   [...targets].sort(()=>Math.random()-.5).slice(0,Math.min(3,targets.length))
     .forEach((t,i)=>spawnSignal(src,t,col,i*75,0.55));
@@ -356,7 +362,7 @@ function onNodeEnter(e,nd,g){
   g.transition().duration(155).ease(d3.easeBackOut.overshoot(1.4))
     .attr('transform',`translate(${nd.x},${nd.y}) scale(1.44)`);
   g.select('.node-body').attr('stroke-opacity',1).attr('fill',col+'33').attr('filter',`url(#gl-${nd.layer})`);
-  g.select('.nucleus').attr('r',6).attr('opacity',1);
+  g.select('.node-sym').attr('opacity',1).attr('font-size', nd.sym && nd.sym.length<=1?'13px':nd.sym && nd.sym.length<=2?'11px':'9px');
   g.select('.prox-ring').attr('stroke-opacity',.7).attr('r',NODE_R+11);
 
   // Animated flow edges
@@ -395,8 +401,8 @@ function onNodeLeave(nd,g){
   const col=LAYERS[nd.layer].col;
   g.transition().duration(200).ease(d3.easeCubicOut)
     .attr('transform',`translate(${nd.x},${nd.y}) scale(1)`);
-  g.select('.node-body').attr('stroke-opacity',.52).attr('fill',col+'1c').attr('filter',null);
-  g.select('.nucleus').attr('r',4.5).attr('opacity',.85);
+  g.select('.node-body').attr('r',NODE_R).attr('stroke-opacity',.52).attr('fill',col+'1c').attr('filter',null);
+  g.select('.node-sym').attr('opacity',.92);
   g.select('.prox-ring').attr('stroke-opacity',0);
   flowEdgeG.selectAll('*').remove();
   nodeG.each(function(){d3.select(this).transition().duration(280).style('opacity',1);});
@@ -442,15 +448,15 @@ function proxLoop(){
       const dx=d.x-mouseRX,dy=d.y-mouseRY,dist=Math.sqrt(dx*dx+dy*dy);
       if(dist<PROX){
         const t=Math.pow(1-dist/PROX,2.4);
+        // r은 건드리지 않음 — glow/stroke만
         d3.select(this).select('.node-body')
-          .attr('stroke-opacity',.52+t*.48).attr('r',NODE_R+t*2.8)
+          .attr('stroke-opacity',.52+t*.48)
           .attr('filter',t>.42?`url(#gl-${d.layer})`:null);
         d3.select(this).select('.prox-ring').attr('stroke-opacity',t*.5).attr('r',NODE_R+10+t*5);
-        d3.select(this).select('.nucleus').attr('r',4.5+t*1.8);
       }else{
-        d3.select(this).select('.node-body').attr('stroke-opacity',.52).attr('r',NODE_R).attr('filter',null);
-        d3.select(this).select('.prox-ring').attr('stroke-opacity',0);
-        d3.select(this).select('.nucleus').attr('r',4.5);
+        d3.select(this).select('.node-body')
+          .attr('stroke-opacity',.52).attr('filter',null);
+        d3.select(this).select('.prox-ring').attr('stroke-opacity',0).attr('r',NODE_R+10);
       }
     });
   }
