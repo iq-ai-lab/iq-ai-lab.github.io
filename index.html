@@ -63,7 +63,7 @@
     .rm-subtitle{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.6}
     .rm-subtitle em{color:#94a3b8;font-style:normal}
     .rm-progress{margin-top:14px;background:rgba(255,255,255,.06);border-radius:4px;height:3px;overflow:hidden}
-    .rm-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B82F6,#6366F1,#8B5CF6,#F59E0B,#EF4444,#EC4899,#A78BFA,#06B6D4);width:0%;transition:width .6s cubic-bezier(0.4,0,0.2,1)}
+    .rm-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B82F6,#6366F1,#8B5CF6,#F59E0B,#EF4444,#EC4899,#A78BFA,#14B8A6,#06B6D4);width:0%;transition:width .6s cubic-bezier(0.4,0,0.2,1)}
     .rm-progress-label{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:5px}
     #rm-body{flex:1;overflow-y:auto;padding:12px 0 24px}
     #rm-body::-webkit-scrollbar{width:4px}
@@ -226,8 +226,172 @@
 </div>
 
 <script>
-// ═══ BACKGROUND ════════════════════════════════════
-(function(){const c=document.getElementById('eq-bg'),ctx=c.getContext('2d');const EQS=['∂L/∂w','σ(z)','∇θJ','E[Rₜ]','V*(s)','π*(a|s)','KL(p‖q)','H(X)','argmax Q','ELBO','Aᵀ=UΣVᵀ','∫p dx=1','J(π)','det(J)','‖w‖²','tanh(z)','βKL','α∇J','Σ⁻¹','tr(A)','ReLU','softmax','∑wᵢxᵢ','SAE','GRPO','RAG','SDS'];let drops=[],bgDots=[],bgSignals=[],blobs=[];function initSignalTimer(){const tryConnect=()=>{for(let t=0;t<30;t++){const a=bgDots[Math.floor(Math.random()*bgDots.length)];const b=bgDots[Math.floor(Math.random()*bgDots.length)];const d=Math.hypot(a.x-b.x,a.y-b.y);if(d>60&&d<185){bgSignals.push({ax:a.x,ay:a.y,bx:b.x,by:b.y,p:0,sp:.007+Math.random()*.005});break;}}};tryConnect();setTimeout(initSignalTimer,700+Math.random()*1000);}function resize(){c.width=innerWidth;c.height=innerHeight;const W=c.width,H=c.height,mW=W*.11;drops=Array.from({length:22},()=>({x:Math.random()<.5?Math.random()*mW:W-mW+Math.random()*mW,y:Math.random()*H,eq:EQS[Math.floor(Math.random()*EQS.length)],speed:Math.random()*.24+.05,opacity:Math.random()*.06+.022,size:Math.floor(Math.random()*4)+9}));bgDots=Array.from({length:75},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.1,vy:(Math.random()-.5)*.1,r:Math.random()*.9+.3,op:Math.random()*.12+.05}));blobs=[{x:W*.18,y:H*.28,r:W*.22,vx:.055,vy:.04,col:[59,130,246],op:.055},{x:W*.82,y:H*.55,r:W*.20,vx:-.04,vy:-.05,col:[139,92,246],op:.048},{x:W*.5,y:H*.82,r:W*.18,vx:.05,vy:-.045,col:[6,182,212],op:.04},{x:W*.25,y:H*.72,r:W*.16,vx:-.04,vy:.055,col:[34,197,94],op:.03},{x:W*.75,y:H*.2,r:W*.17,vx:.035,vy:.04,col:[249,115,22],op:.028}];}function drawBlobs(W,H){blobs.forEach(b=>{const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);const[r,g2,bl]=b.col;g.addColorStop(0,`rgba(${r},${g2},${bl},${b.op})`);g.addColorStop(.5,`rgba(${r},${g2},${bl},${b.op*.4})`);g.addColorStop(1,`rgba(${r},${g2},${bl},0)`);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);b.x+=b.vx;b.y+=b.vy;if(b.x-b.r<-W*.1||b.x+b.r>W*1.1)b.vx*=-1;if(b.y-b.r<-H*.1||b.y+b.r>H*1.1)b.vy*=-1;});}function draw(){const W=c.width,H=c.height;ctx.clearRect(0,0,W,H);drawBlobs(W,H);for(let i=0;i<bgDots.length;i++){for(let j=i+1;j<bgDots.length;j++){const a=bgDots[i],b=bgDots[j];const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<175){const op=(1-d/175)*.06;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(59,130,246,${op.toFixed(3)})`;ctx.lineWidth=.45;ctx.stroke();}}}bgDots.forEach(d=>{ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fillStyle=`rgba(59,130,246,${d.op.toFixed(3)})`;ctx.fill();d.x+=d.vx;d.y+=d.vy;if(d.x<-12)d.x=W+12;else if(d.x>W+12)d.x=-12;if(d.y<-12)d.y=H+12;else if(d.y>H+12)d.y=-12;});for(let i=bgSignals.length-1;i>=0;i--){const s=bgSignals[i];s.p+=s.sp;const x=s.ax+(s.bx-s.ax)*s.p,y=s.ay+(s.by-s.ay)*s.p;const op=Math.sin(s.p*Math.PI)*.45;ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle=`rgba(59,130,246,${op.toFixed(3)})`;ctx.fill();if(s.p>=1)bgSignals.splice(i,1);}drops.forEach(d=>{ctx.font=`${d.size}px JetBrains Mono,monospace`;ctx.fillStyle=`rgba(59,130,246,${d.opacity})`;ctx.fillText(d.eq,d.x,d.y);d.y+=d.speed;if(d.y>H+20){d.y=-20;d.eq=EQS[Math.floor(Math.random()*EQS.length)];}});requestAnimationFrame(draw);}resize();draw();setTimeout(initSignalTimer,1200);addEventListener('resize',resize);})();
+// ═══ BACKGROUND — Gradient Cosmos ══════════════════
+(function(){
+  const c=document.getElementById('eq-bg'),ctx=c.getContext('2d');
+  c.style.opacity='1'; // 즉시 보이게
+  const EQS=['∂L/∂w','σ(z)','∇θJ','E[Rₜ]','V*(s)','π*(a|s)','KL(p‖q)','H(X)','argmax Q','ELBO','Aᵀ=UΣVᵀ','∫p dx=1','J(π)','det(J)','‖w‖²','tanh(z)','βKL','α∇J','Σ⁻¹','tr(A)','ReLU','softmax','∑wᵢxᵢ','SAE','GRPO','RAG','SDS'];
+  let drops=[],stars=[],blobs=[],flows=[],bursts=[];
+  const STAR_COLS=[[147,197,253],[196,181,253],[165,243,252],[254,215,170],[252,165,165]]; // 별색 다양화
+
+  function resize(){
+    c.width=innerWidth;c.height=innerHeight;
+    const W=c.width,H=c.height,mW=W*.12;
+
+    // Tensor equation rain (화면 양 끝)
+    drops=Array.from({length:26},()=>({x:Math.random()<.5?Math.random()*mW:W-mW+Math.random()*mW,y:Math.random()*H,eq:EQS[Math.floor(Math.random()*EQS.length)],speed:Math.random()*.26+.05,opacity:Math.random()*.08+.028,size:Math.floor(Math.random()*4)+9}));
+
+    // Deep stars field — 많고 다양한 색, 개별 twinkle
+    stars=Array.from({length:220},()=>{
+      const cPick=STAR_COLS[Math.floor(Math.random()*STAR_COLS.length)];
+      return{
+        x:Math.random()*W,y:Math.random()*H,
+        vx:(Math.random()-.5)*.05,vy:(Math.random()-.5)*.05,
+        r:Math.random()*1.3+.2,
+        baseA:Math.random()*.45+.1,
+        col:cPick,
+        tw:Math.random()*Math.PI*2,
+        twSp:.015+Math.random()*.045
+      };
+    });
+
+    // Deep nebula blobs — 더 크고 진하게
+    blobs=[
+      {x:W*.15,y:H*.25,r:W*.32,vx:.05,vy:.04,col:[59,130,246],op:.085},     // blue
+      {x:W*.85,y:H*.55,r:W*.28,vx:-.04,vy:-.05,col:[139,92,246],op:.075},   // purple
+      {x:W*.5, y:H*.85,r:W*.26,vx:.045,vy:-.04,col:[6,182,212],op:.062},    // cyan
+      {x:W*.22,y:H*.72,r:W*.22,vx:-.035,vy:.05,col:[236,72,153],op:.048},   // pink
+      {x:W*.78,y:H*.18,r:W*.24,vx:.03,vy:.038,col:[249,115,22],op:.042}     // orange
+    ];
+
+    // Gradient flow streams — 화면을 가로지르는 사인파 곡선들
+    flows=Array.from({length:5},(_,i)=>({
+      y:H*(0.15+i*0.18),
+      phase:Math.random()*Math.PI*2,
+      freq:0.0007+Math.random()*0.0012,
+      amp:45+Math.random()*55,
+      waveLen:0.004+Math.random()*0.005,
+      col:[[59,130,246],[139,92,246],[6,182,212],[236,72,153],[167,139,250]][i],
+      op:0.045+Math.random()*0.025,
+      thickness:0.8+Math.random()*1.4,
+      speed:0.3+Math.random()*0.4
+    }));
+  }
+
+  function drawBlobs(W,H){
+    blobs.forEach(b=>{
+      const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+      const[r,gg,bl]=b.col;
+      g.addColorStop(0,`rgba(${r},${gg},${bl},${b.op})`);
+      g.addColorStop(.45,`rgba(${r},${gg},${bl},${b.op*.45})`);
+      g.addColorStop(1,`rgba(${r},${gg},${bl},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+      b.x+=b.vx;b.y+=b.vy;
+      if(b.x-b.r<-W*.15||b.x+b.r>W*1.15)b.vx*=-1;
+      if(b.y-b.r<-H*.15||b.y+b.r>H*1.15)b.vy*=-1;
+    });
+  }
+
+  function drawFlows(W,H,t){
+    flows.forEach(fc=>{
+      ctx.beginPath();
+      const time=t*fc.freq;
+      for(let x=0;x<=W;x+=6){
+        const y=fc.y
+          +Math.sin(x*fc.waveLen+time+fc.phase)*fc.amp
+          +Math.sin(x*fc.waveLen*0.4-time*0.5)*fc.amp*0.35
+          +Math.cos(x*fc.waveLen*0.15+time*0.3)*fc.amp*0.2;
+        if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      const[r,g,b]=fc.col;
+      const grad=ctx.createLinearGradient(0,0,W,0);
+      grad.addColorStop(0,`rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.5,`rgba(${r},${g},${b},${fc.op})`);
+      grad.addColorStop(1,`rgba(${r},${g},${b},0)`);
+      ctx.strokeStyle=grad;
+      ctx.lineWidth=fc.thickness;
+      ctx.stroke();
+      fc.phase+=fc.speed*0.001;
+    });
+  }
+
+  function drawStars(W,H,t){
+    stars.forEach(s=>{
+      const twinkle=0.55+0.45*Math.sin(t*s.twSp+s.tw);
+      const op=s.baseA*twinkle;
+      const[r,g,b]=s.col;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${b},${op.toFixed(3)})`;
+      ctx.fill();
+      // 큰 별은 cross glow
+      if(s.r>1.1&&twinkle>0.85){
+        ctx.strokeStyle=`rgba(${r},${g},${b},${(op*.5).toFixed(3)})`;
+        ctx.lineWidth=.4;
+        ctx.beginPath();
+        ctx.moveTo(s.x-s.r*2.5,s.y);ctx.lineTo(s.x+s.r*2.5,s.y);
+        ctx.moveTo(s.x,s.y-s.r*2.5);ctx.lineTo(s.x,s.y+s.r*2.5);
+        ctx.stroke();
+      }
+      s.x+=s.vx;s.y+=s.vy;
+      if(s.x<-10)s.x=W+10;else if(s.x>W+10)s.x=-10;
+      if(s.y<-10)s.y=H+10;else if(s.y>H+10)s.y=-10;
+    });
+  }
+
+  // Synaptic bursts — 가끔 한 점에서 방사형 flash
+  function spawnBurst(){
+    const W=c.width,H=c.height;
+    bursts.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:0,maxR:80+Math.random()*60,
+      life:1,
+      col:STAR_COLS[Math.floor(Math.random()*STAR_COLS.length)]
+    });
+    setTimeout(spawnBurst,3500+Math.random()*4500);
+  }
+
+  function drawBursts(){
+    for(let i=bursts.length-1;i>=0;i--){
+      const b=bursts[i];
+      const[r,g,bl]=b.col;
+      const op=b.life*0.35;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(${r},${g},${bl},${op.toFixed(3)})`;
+      ctx.lineWidth=1;ctx.stroke();
+      // inner dot
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,1.5,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${bl},${(b.life*0.7).toFixed(3)})`;
+      ctx.fill();
+      b.r+=2.5;b.life-=0.025;
+      if(b.life<=0||b.r>b.maxR)bursts.splice(i,1);
+    }
+  }
+
+  function draw(){
+    const W=c.width,H=c.height,t=Date.now();
+    ctx.clearRect(0,0,W,H);
+    drawBlobs(W,H);
+    drawFlows(W,H,t);
+    drawStars(W,H,t);
+    drawBursts();
+    // Tensor equation rain
+    drops.forEach(d=>{
+      ctx.font=`${d.size}px JetBrains Mono,monospace`;
+      ctx.fillStyle=`rgba(147,197,253,${d.opacity})`;
+      ctx.fillText(d.eq,d.x,d.y);
+      d.y+=d.speed;
+      if(d.y>H+20){d.y=-20;d.eq=EQS[Math.floor(Math.random()*EQS.length)];}
+    });
+    requestAnimationFrame(draw);
+  }
+
+  resize();draw();
+  setTimeout(spawnBurst,2000);
+  addEventListener('resize',resize);
+})();
 
 // ═══ DATA ═════════════════════════════════════════
 const BASE='https://github.com/iq-ai-lab';
@@ -293,8 +457,9 @@ const ROADMAP_LEVELS=[
   {id:4,name:'Neural Networks & Architectures',subtitle:'신경망 이론과 핵심 아키텍처',color:'#F59E0B',repos:['nn','ot','gen','reg','cn','rnn','tr','gnn','gv'],tip:'역전파부터 Attention까지. 현대 AI의 벽돌들을 수학으로 쌓는다.'},
   {id:5,name:'Reinforcement Learning',subtitle:'의사결정의 수학 — MDP부터 PPO까지',color:'#EF4444',repos:['rf','mfr','dr','pg','ar','rt'],tip:'벨만 방정식의 수렴 증명에서 PPO 단조개선·GRPO까지 일관된 흐름.'},
   {id:6,name:'Language Models',subtitle:'LLM의 학습과 추론',color:'#EC4899',repos:['lp','la2','le','li','nf','plm'],tip:'Scaling Law와 Alignment — 창업에 가장 가까운 경로.'},
-  {id:7,name:'Vision, Audio & Systems',subtitle:'멀티모달과 시스템 엔지니어링',color:'#A78BFA',repos:['vt','od','df','nr','as','pi','dt2','ef'],tip:'이미지·음성 모달리티와 PyTorch/분산학습/효율화 — 수학을 실제로.'},
-  {id:8,name:'Frontier & Production',subtitle:'프론티어 연구와 운영의 통계',color:'#06B6D4',repos:['mo','mi','ra','rr'],tip:'LLM이 어떻게 생각하고·검색하고·운영되는가. 현재 진행형 연구.'},
+  {id:7,name:'Vision & Audio',subtitle:'이미지·3D·음성의 수학적 구조',color:'#A78BFA',repos:['vt','od','df','nr','as'],tip:'ViT·Diffusion·NeRF·Whisper — 멀티모달 AI의 각 모달리티 본질.'},
+  {id:8,name:'Systems Engineering',subtitle:'수학을 실제 시스템으로',color:'#14B8A6',repos:['pi','dt2','ef','mo'],tip:'PyTorch·분산학습·효율화·실험통계 — 학습된 모델을 현실에 배포한다.'},
+  {id:9,name:'Frontier Research',subtitle:'LLM의 해석·추론·검색',color:'#06B6D4',repos:['mi','ra','rr'],tip:'모델이 왜 그렇게 답하는가 — 현재 진행형 연구의 최전선.'},
 ];
 
 // ═══ LAYOUT ════════════════════════════════════════
