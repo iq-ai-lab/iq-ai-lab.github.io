@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IQ AI Lab">
+  <circle cx="32" cy="32" r="30" fill="#17090D"/>
+  <circle cx="32" cy="32" r="28.5" fill="none" stroke="#7C3140" stroke-width="3"/>
+  <path d="M45 16H19l15 16-15 16h26"
+        fill="none" stroke="#D6A0AA" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 32h5M47 32h5" fill="none" stroke="#A24C5B" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="10" cy="32" r="2.25" fill="#D6A0AA"/>
+  <circle cx="54" cy="32" r="2.25" fill="#D6A0AA"/>
+</svg>
